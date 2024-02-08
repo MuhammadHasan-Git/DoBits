@@ -3,4 +3,7 @@ import 'package:get/get.dart';
 
 class HomeController extends GetxController {
   final PageController pageController = PageController(viewportFraction: 0.9);
+  RxInt index = 0.obs;
+  
+  
 }

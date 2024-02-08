@@ -9,22 +9,27 @@ class PriorityTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeController = Get.put(HomeController());
-    return SizedBox(
-      height: 180,
-      child: PageView.builder(
-        controller: homeController.pageController,
-        itemCount: 4,
-        pageSnapping: true,
-        itemBuilder: (BuildContext context, pagePosition) {
-          return Container(
-            margin: const EdgeInsets.only(right: 15, top: 10, bottom: 10),
-            decoration: BoxDecoration(
-              color: white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-          );
-        },
-      ),
+    return Column(
+      children: [
+        
+        SizedBox(
+          height: 180,
+          child: PageView.builder(
+            controller: homeController.pageController,
+            itemCount: 4,
+            pageSnapping: true,
+            itemBuilder: (BuildContext context, pagePosition) {
+              return Container(
+                margin: const EdgeInsets.only(right: 15, top: 10, bottom: 10),
+                decoration: BoxDecoration(
+                  color: white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
