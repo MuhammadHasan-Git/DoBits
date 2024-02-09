@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get.dart';
 import 'package:todo_app/firebase_options.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/view/home_page.dart';
@@ -19,10 +19,12 @@ void main() async {
   );
   runApp(GetMaterialApp(
     theme: ThemeData(
-        scaffoldBackgroundColor: black,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: black,
-        )),
+      scaffoldBackgroundColor: black,
+      dialogBackgroundColor: black,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: black,
+      ),
+    ),
     debugShowCheckedModeBanner: false,
     home: const HomePage(),
   ));

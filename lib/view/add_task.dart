@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/get_core.dart';
 import 'package:get/get_instance/get_instance.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/view/widget/button.dart';
 import 'package:todo_app/view/widget/category.dart';
+import 'package:todo_app/view/widget/remind_widget.dart';
+import 'package:todo_app/view/widget/task_priority.dart';
 import 'package:todo_app/view/widget/text_field.dart';
 
 class AddTask extends StatelessWidget {
@@ -13,6 +15,8 @@ class AddTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskController = Get.put(TaskController());
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: white),
@@ -63,6 +67,23 @@ class AddTask extends StatelessWidget {
               const SizedBox(
                 height: 30,
               ),
+              const Text(
+                "Description (optional)",
+                style: TextStyle(
+                  color: white,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              CustomTextField(
+                width: double.infinity,
+                controller: taskController.titleController,
+                hintText: 'Description',
+              ),
+              const SizedBox(
+                height: 30,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -79,7 +100,7 @@ class AddTask extends StatelessWidget {
                         height: 5,
                       ),
                       CustomTextField(
-                        width: Get.width / 2 * 0.5,
+                        width: width / 2 * 0.5,
                         textAlign: TextAlign.center,
                         controller: taskController.startTimeInput,
                         readOnly: true,
@@ -101,7 +122,7 @@ class AddTask extends StatelessWidget {
                         height: 5,
                       ),
                       CustomTextField(
-                        width: Get.width / 2 * 0.5,
+                        width: width / 2 * 0.5,
                         textAlign: TextAlign.center,
                         controller: taskController.endTimeInput,
                         readOnly: true,
@@ -124,7 +145,31 @@ class AddTask extends StatelessWidget {
               const SizedBox(
                 height: 5,
               ),
-              CategoryList(),
+              const CategoryList(),
+              const SizedBox(
+                height: 30,
+              ),
+              const Text(
+                "Set Priorities",
+                style: TextStyle(
+                  color: white,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              const TaskPriority(),
+              const SizedBox(
+                height: 30,
+              ),
+              const Reminder(),
+              const SizedBox(
+                height: 30,
+              ),
+              CustomButton(
+                text: "Create Task",
+                onPressed: () {},
+              )
             ],
           ),
         ),

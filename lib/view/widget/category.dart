@@ -15,18 +15,19 @@ class CategoryList extends StatelessWidget {
 
     return Wrap(
       spacing: 2.0.wp,
-      children: List.generate(defaultCategories.length, (index) {
-        final categoryList = TaskCategory(
-            name: defaultCategories[index],
-            color: defaultCategoriesColor[index]);
-        if (index == defaultCategories.length - 1) {
+      children: List.generate(defaultCategories.length + 1, (index) {
+        if (index == 0) {
           return InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(10),
+            onTap: () {
+              taskController.dialogBuilder(context);
+            },
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+            borderRadius: BorderRadius.circular(20),
             child: Container(
               width: 120,
               height: 36,
-              margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+              margin: const EdgeInsets.symmetric(vertical: 6),
               decoration: BoxDecoration(
                 color: white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
@@ -52,11 +53,15 @@ class CategoryList extends StatelessWidget {
             ),
           );
         } else {
+          final adjustedIndex = index - 1;
+          final categoryList = TaskCategory(
+              name: defaultCategories[adjustedIndex],
+              color: defaultCategoriesColor[adjustedIndex]);
           return GestureDetector(
-            onTap: () => taskController.chipIndex.value = index,
+            onTap: () => taskController.chipIndex.value = adjustedIndex,
             child: Obx(
               () => Chip(
-                avatar: taskController.chipIndex.value == index
+                avatar: taskController.chipIndex.value == adjustedIndex
                     ? const Icon(Icons.done)
                     : null,
                 shape: RoundedRectangleBorder(
@@ -70,10 +75,12 @@ class CategoryList extends StatelessWidget {
                   ),
                 ),
                 side: BorderSide(
-                    color: taskController.chipIndex.value == index
+                    color: taskController.chipIndex.value == adjustedIndex
                         ? categoryList.color
                         : Colors.transparent,
-                    width: taskController.chipIndex.value == index ? 2 : 0),
+                    width: taskController.chipIndex.value == adjustedIndex
+                        ? 2
+                        : 0),
                 color: MaterialStatePropertyAll(
                   categoryList.color.withOpacity(0.15),
                 ),
