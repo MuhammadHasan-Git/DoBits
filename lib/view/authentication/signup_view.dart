@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/auth_controller.dart';
+import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/authentication/widgets/text_field.dart';
@@ -14,6 +15,7 @@ class SignupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.put(AuthController());
+    final user = Get.put(UserController());
     final nameController = TextEditingController();
     final emailController = TextEditingController();
     final passController = TextEditingController();
@@ -168,8 +170,8 @@ class SignupView extends StatelessWidget {
                     text: "SignUp",
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
-                        await authController.signUp(nameController,
-                            emailController, passController, context);
+                        await user.signUp(nameController, emailController,
+                            passController, context);
                       }
                     },
                   ),
