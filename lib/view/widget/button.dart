@@ -3,7 +3,7 @@ import 'package:todo_app/utils/colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-  
+
   final Function() onPressed;
 
   const CustomButton({super.key, required this.text, required this.onPressed});
@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
+      height: 50,
       child: ElevatedButton(
         style: ButtonStyle(
           shape: MaterialStatePropertyAll(

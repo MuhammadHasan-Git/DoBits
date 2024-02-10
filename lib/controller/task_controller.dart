@@ -63,12 +63,13 @@ class TaskController extends GetxController {
 
   final chipIndex = 0.obs;
 
-  Rx<Color> selectedColor = Colors.transparent.obs;
+  Rx<Color> selectedColor = const Color(0xff778CDD).obs;
   RxInt buttonIndex = 0.obs;
 
   addCategory(String name, Rx<Color> color, context) {
     categories.add(TaskCategory(color: color.value, name: name));
     Navigator.of(context).pop();
+    selectedColor.value = const Color(0xff778CDD);
     buttonIndex.value = 0;
     categoryName.clear();
   }
@@ -89,7 +90,7 @@ class TaskController extends GetxController {
             data: ThemeData(
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor: darkBlue, // button text color
+                  foregroundColor: darkBlue,
                 ),
               ),
               colorScheme: const ColorScheme.dark(
@@ -135,6 +136,7 @@ class TaskController extends GetxController {
   Future<void> dialogBuilder(BuildContext context) {
     return showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: black,
@@ -154,6 +156,9 @@ class TaskController extends GetxController {
               child: const Text('Cancle'),
               onPressed: () {
                 Navigator.of(context).pop();
+                selectedColor.value = const Color(0xff778CDD);
+                buttonIndex.value = 0;
+                categoryName.clear();
               },
             ),
             TextButton(

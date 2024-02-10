@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:todo_app/controller/controller.dart';
 import 'package:todo_app/firebase_options.dart';
 import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/view/authentication/auth.dart';
 import 'package:todo_app/view/home_page.dart';
 
 void main() async {
@@ -22,14 +23,19 @@ void main() async {
     theme: ThemeData(
       scaffoldBackgroundColor: black,
       dialogBackgroundColor: black,
+      navigationBarTheme: const NavigationBarThemeData(
+          labelTextStyle: MaterialStatePropertyAll(TextStyle(color: darkBlue))),
       appBarTheme: const AppBarTheme(
         backgroundColor: black,
       ),
     ),
     debugShowCheckedModeBanner: false,
-    home: const MyApp(),
+    navigatorKey: navigatorKey,
+    home: const Auth(),
   ));
 }
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -40,40 +46,62 @@ class MyApp extends StatelessWidget {
     return Obx(
       () => Scaffold(
         body: const HomePage(),
-        bottomNavigationBar: Theme(
-          data: ThemeData(
-              splashFactory: NoSplash.splashFactory,
-              splashColor: black,
-              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                selectedItemColor: blue,
-                unselectedItemColor: Colors.grey,
-                backgroundColor: black,
-                elevation: 0,
-              )),
-          child: BottomNavigationBar(
-            currentIndex: homeController.index.value,
-            onTap: (value) {
-              homeController.index.value = value;
-            },
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
+        bottomNavigationBar: NavigationBar(
+          backgroundColor: black,
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+          elevation: 0,
+          onDestinationSelected: (int index) {
+            homeController.index.value = index;
+          },
+          indicatorColor: darkBlue.withOpacity(0.2),
+          selectedIndex: homeController.index.value,
+          destinations: const <Widget>[
+            NavigationDestination(
+              selectedIcon: Icon(
+                Icons.home,
+                color: darkBlue,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.task_alt),
-                label: 'My Task',
+              icon: Icon(
+                Icons.home_outlined,
+                color: Colors.grey,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.bar_chart),
-                label: 'Insight',
+              label: 'Home',
+            ),
+            NavigationDestination(
+              selectedIcon: Icon(
+                Icons.task_alt,
+                color: darkBlue,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
+              icon: Icon(
+                Icons.task_alt,
+                color: Colors.grey,
               ),
-            ],
-          ),
+              label: 'Tasks',
+            ),
+            NavigationDestination(
+              selectedIcon: Icon(
+                Icons.bar_chart_rounded,
+                color: darkBlue,
+              ),
+              icon: Icon(
+                Icons.bar_chart_rounded,
+                color: Colors.grey,
+              ),
+              label: 'Insight',
+            ),
+            NavigationDestination(
+              selectedIcon: Icon(
+                Icons.person,
+                color: darkBlue,
+              ),
+              icon: Icon(
+                Icons.person_outline,
+                color: Colors.grey,
+              ),
+              label: 'Profile',
+            ),
+          ],
         ),
       ),
     );
