@@ -16,9 +16,13 @@ class DialogContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomTextField(
-          width: double.infinity,
-          controller: taskController.categoryTitle,
+        Obx(
+          () => CustomTextField(
+            width: double.infinity,
+            controller: taskController.categoryName,
+            hintText: "Category Name",
+            color: taskController.selectedColor.value,
+          ),
         ),
         SizedBox(
           height: 5.0.wp,

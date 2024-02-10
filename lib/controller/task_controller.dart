@@ -13,6 +13,37 @@ class TaskController extends GetxController {
     return DateFormat.jm().format(dateTime);
   }
 
+  RxList<TaskCategory> categories = [
+    TaskCategory(
+      name: 'Personal',
+      color: const Color(0xff42A5F5),
+    ),
+    TaskCategory(
+      name: 'Work',
+      color: const Color(0xff607D8B),
+    ),
+    TaskCategory(
+      name: 'Sports',
+      color: const Color(0xff4CAF50),
+    ),
+    TaskCategory(
+      name: 'Study',
+      color: const Color(0xffFF9800),
+    ),
+    TaskCategory(
+      name: 'Health',
+      color: const Color(0xffF44336),
+    ),
+    TaskCategory(
+      name: 'Entertainment',
+      color: const Color(0xff41CF9F),
+    ),
+    TaskCategory(
+      name: 'Finance',
+      color: const Color(0xff3F51B5),
+    ),
+  ].obs;
+
   String formattedDate = "";
   DateTime? selectedDate;
   TimeOfDay? selectedStartTime;
@@ -28,9 +59,27 @@ class TaskController extends GetxController {
       text: formatTime(const TimeOfDay(hour: 14, minute: 0)));
   final endTimeInput = TextEditingController(
       text: formatTime(const TimeOfDay(hour: 17, minute: 0)));
-  final categoryTitle = TextEditingController();
+  final categoryName = TextEditingController();
+
   final chipIndex = 0.obs;
-  RxList<TaskCategory> addedCategories = <TaskCategory>[].obs;
+
+  Rx<Color> selectedColor = Colors.transparent.obs;
+  RxInt buttonIndex = 0.obs;
+
+  addCategory(String name, Rx<Color> color, context) {
+    categories.add(TaskCategory(color: color.value, name: name));
+    Navigator.of(context).pop();
+    buttonIndex.value = 0;
+    categoryName.clear();
+  }
+
+  deleteCategory(index) {
+    if (index > 6) {
+      categories.remove(categories[index]);
+    } else {
+      null;
+    }
+  }
 
   Future displayDatePicker(BuildContext context) async {
     final initialDate = selectedDate ?? DateTime.now();
@@ -110,9 +159,8 @@ class TaskController extends GetxController {
             TextButton(
               style: TextButton.styleFrom(foregroundColor: darkBlue),
               child: const Text('Create'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () =>
+                  addCategory(categoryName.text, selectedColor, context),
             ),
           ],
         );

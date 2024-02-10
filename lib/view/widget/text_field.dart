@@ -10,11 +10,14 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.textAlign = TextAlign.start,
     this.readOnly = false,
+    this.color = white,
   });
 
   final String? hintText;
 
   final double width;
+
+  final Color? color;
 
   final bool? readOnly;
 
@@ -33,8 +36,8 @@ class CustomTextField extends StatelessWidget {
         textAlign: textAlign!,
         readOnly: readOnly!,
         controller: controller,
-        style: const TextStyle(
-          color: white,
+        style: TextStyle(
+          color: color,
           height: 1.28,
           fontSize: 18,
         ),
