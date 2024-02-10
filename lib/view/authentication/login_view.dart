@@ -151,103 +151,64 @@ class LoginView extends StatelessWidget {
                   const SizedBox(
                     height: 25,
                   ),
-                  Center(
-                    child: IntrinsicWidth(
-                      child: InkWell(
-                        onTap: () async {
-                          showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (context) => const Center(
-                                  child: CircularProgressIndicator()));
-                          try {
-                            final user = await userController.loginWithGoogle();
-                            if (user != null) {
-                              Get.to(() => const HomePage());
-                            } else {}
-                          } on FirebaseAuthException catch (error) {
-                            log(error.message.toString());
-                            Get.showSnackbar(
-                              GetSnackBar(
-                                message: error.message,
-                                title: "Failed to Sign in with Google",
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                          } catch (error) {
-                            log(error.toString());
-                            Get.showSnackbar(
-                              GetSnackBar(
-                                message: error.toString(),
-                                title: "Failed to Sign in with Google",
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                          }
-
-                          navigatorKey.currentState!
-                              .popUntil((route) => route.isFirst);
-                        },
-                        borderRadius: BorderRadius.circular(30),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                color: white.withOpacity(0.5),
-                              ),
-                              borderRadius: BorderRadius.circular(30)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "assets/images/google_logo.png",
-                                fit: BoxFit.cover,
-                                width: 30,
-                                height: 30,
-                              ),
-                              SizedBox(
-                                width: 5.0.wp,
-                              ),
-                              Text(
-                                "Continue With Google",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: white,
-                                ),
-                              ),
-                            ],
+                  ListTile(
+                    onTap: () async {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) =>
+                              const Center(child: CircularProgressIndicator()));
+                      try {
+                        final user = await userController.loginWithGoogle();
+                        if (user != null) {
+                          Get.to(() => const HomePage());
+                        } else {}
+                      } on FirebaseAuthException catch (error) {
+                        log(error.message.toString());
+                        Get.showSnackbar(
+                          GetSnackBar(
+                            message: error.message,
+                            title: "Failed to Sign in with Google",
+                            duration: const Duration(seconds: 2),
                           ),
+                        );
+                      } catch (error) {
+                        log(error.toString());
+                        Get.showSnackbar(
+                          GetSnackBar(
+                            message: error.toString(),
+                            title: "Failed to Sign in with Google",
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+
+                      navigatorKey.currentState!
+                          .popUntil((route) => route.isFirst);
+                    },
+                    shape: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: white.withOpacity(0.5),
+                      ),
+                    ),
+                    title: const Center(
+                      child: Text(
+                        "Log in with Google",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: white,
                         ),
                       ),
                     ),
+                    leading: Image.asset(
+                      "assets/images/google_logo.png",
+                      fit: BoxFit.cover,
+                      width: 30,
+                      height: 30,
+                    ),
                   ),
-                  // ListTile(
-                  //   shape: OutlineInputBorder(
-                  //     borderRadius: BorderRadius.circular(12),
-                  //     borderSide: BorderSide(
-                  //       color: white.withOpacity(0.5),
-                  //     ),
-                  //   ),
-                  //   title: const Center(
-                  //     child: Text(
-                  //       "Log in with Google",
-                  //       style: TextStyle(
-                  //         fontSize: 18,
-                  //         fontWeight: FontWeight.w500,
-                  //         color: white,
-                  //       ),
-                  //     ),
-                  //   ),
-                  //   leading: Image.asset(
-                  //     "assets/images/google_logo.png",
-                  //     fit: BoxFit.cover,
-                  //     width: 30,
-                  //     height: 30,
-                  //   ),
-                  // ),
                   SizedBox(
                     height: 10.0.wp,
                   ),

@@ -1,11 +1,16 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/auth_controller.dart';
 import 'package:todo_app/controller/user_controller.dart';
+import 'package:todo_app/main.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/authentication/widgets/text_field.dart';
+import 'package:todo_app/view/home_page.dart';
 import 'package:todo_app/view/widget/button.dart';
 
 class SignupView extends StatelessWidget {
@@ -204,6 +209,41 @@ class SignupView extends StatelessWidget {
                     height: 25,
                   ),
                   ListTile(
+                    onTap: () async {
+                      final userController = Get.put(UserController());
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) =>
+                              const Center(child: CircularProgressIndicator()));
+                      try {
+                        final user = await userController.loginWithGoogle();
+                        if (user != null) {
+                          Get.to(() => const HomePage());
+                        } else {}
+                      } on FirebaseAuthException catch (error) {
+                        log(error.message.toString());
+                        Get.showSnackbar(
+                          GetSnackBar(
+                            message: error.message,
+                            title: "Failed to Sign in with Google",
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      } catch (error) {
+                        log(error.toString());
+                        Get.showSnackbar(
+                          GetSnackBar(
+                            message: error.toString(),
+                            title: "Failed to Sign in with Google",
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+
+                      navigatorKey.currentState!
+                          .popUntil((route) => route.isFirst);
+                    },
                     shape: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
