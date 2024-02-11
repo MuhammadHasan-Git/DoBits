@@ -161,24 +161,48 @@ class LoginView extends StatelessWidget {
                       try {
                         final user = await userController.loginWithGoogle();
                         if (user != null) {
+                          userController.createUser(
+                              user.displayName!, user.email!);
                           Get.to(() => const HomePage());
                         } else {}
                       } on FirebaseAuthException catch (error) {
                         log(error.message.toString());
-                        Get.showSnackbar(
-                          GetSnackBar(
-                            message: error.message,
-                            title: "Failed to Sign in with Google",
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
+                        if (error.code ==
+                            'account-exists-with-different-credential') {
+                          Get.showSnackbar(
+                            const GetSnackBar(
+                              message:
+                                  'The account already exists with a different credential',
+                              title: "Failed to Sign in with Google",
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        } else if (error.code == 'invalid-credential') {
+                          Get.showSnackbar(
+                            const GetSnackBar(
+                              message:
+                                  'Error occurred while accessing credentials. Try again.',
+                              title: "Failed to Sign in with Google",
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        } else {
+                          Get.showSnackbar(
+                            GetSnackBar(
+                              message: error.message,
+                              title: "Failed to Sign in with Google",
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
                       } catch (error) {
                         log(error.toString());
                         Get.showSnackbar(
-                          GetSnackBar(
-                            message: error.toString(),
+                          const GetSnackBar(
+                            message:
+                                'Error occurred using Google Sign In. Try again.',
                             title: "Failed to Sign in with Google",
-                            duration: const Duration(seconds: 2),
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       }

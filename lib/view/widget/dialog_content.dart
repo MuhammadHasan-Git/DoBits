@@ -21,7 +21,7 @@ class DialogContent extends StatelessWidget {
             width: double.infinity,
             controller: taskController.categoryName,
             hintText: "Category Name",
-            color: taskController.selectedColor.value,
+            color: Color(taskController.selectedColor.value),
           ),
         ),
         SizedBox(
@@ -31,7 +31,7 @@ class DialogContent extends StatelessWidget {
           "Select Color",
           style: TextStyle(color: white, fontSize: 16),
         ),
-        ColorPicker(),
+        const ColorPicker(),
       ],
     );
   }

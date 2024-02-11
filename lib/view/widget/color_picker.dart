@@ -13,21 +13,21 @@ class ColorPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final taskController = Get.put(TaskController());
 
-    List<Color> colors = const [
-      Color(0xff778CDD),
-      Color(0xffBC79BC),
-      Color(0xffE46D8D),
-      Color(0xffE56B68),
-      Color(0xff4AA079),
-      Color(0xff479E98),
-      Color(0xff88959E),
-      Color(0xffDFEDF8),
-      Color(0xffF2E7F8),
-      Color(0xffFFE4E9),
-      Color(0xffF9E8DE),
-      Color(0xffD5F1E5),
-      Color(0xffD4F1EF),
-      Color(0xffE7ECF0),
+    List<int> colors = const [
+      0xff778CDD,
+      0xffBC79BC,
+      0xffE46D8D,
+      0xffE56B68,
+      0xff4AA079,
+      0xff479E98,
+      0xff88959E,
+      0xffDFEDF8,
+      0xffF2E7F8,
+      0xffFFE4E9,
+      0xffF9E8DE,
+      0xffD5F1E5,
+      0xffD4F1EF,
+      0xffE7ECF0,
     ];
 
     return SingleChildScrollView(
@@ -47,7 +47,7 @@ class ColorPicker extends StatelessWidget {
                 height: 30,
                 margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                 decoration: BoxDecoration(
-                  color: colors[index],
+                  color: Color(colors[index]),
                   shape: BoxShape.circle,
                 ),
                 child: taskController.buttonIndex.value == index

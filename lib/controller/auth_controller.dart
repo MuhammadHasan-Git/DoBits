@@ -9,7 +9,7 @@ class AuthController extends GetxController {
   RxBool isVisibleSignin = true.obs;
   RxBool isEmptySignin1 = true.obs;
   RxBool isVisibleSignin1 = true.obs;
-  
+
   void toggleView() {
     showSignIn.value = !showSignIn.value;
   }

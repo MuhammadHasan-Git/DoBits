@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/get_core.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/add_task.dart';
@@ -118,7 +119,7 @@ class HomePage extends StatelessWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           padding: MaterialStatePropertyAll(EdgeInsets.zero),
                         ),
-                        onPressed: () {},
+                        onPressed: () => UserController.signOut(),
                         child: const Text("View all"),
                       ),
                     ],

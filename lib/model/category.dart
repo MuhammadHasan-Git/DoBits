@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
-
 class TaskCategory {
   final String name;
-  final Color color;
+  final int color;
 
   TaskCategory({required this.color, required this.name});
 }

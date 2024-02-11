@@ -64,22 +64,22 @@ class CategoryList extends StatelessWidget {
                   taskController.categories[adjustedIndex].name,
                   style: TextStyle(
                     fontSize: 12,
-                    color: taskController.categories[adjustedIndex].color,
+                    color: Color(taskController.categories[adjustedIndex].color),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 side: BorderSide(
                     color: taskController.chipIndex.value == adjustedIndex
-                        ? taskController.categories[adjustedIndex].color
+                        ? Color(taskController.categories[adjustedIndex].color)
                         : Colors.transparent,
                     width: taskController.chipIndex.value == adjustedIndex
                         ? 2
                         : 0),
                 color: MaterialStatePropertyAll(
-                  taskController.categories[adjustedIndex].color
+                  Color(taskController.categories[adjustedIndex].color)
                       .withOpacity(0.15),
                 ),
-                surfaceTintColor: taskController.categories[adjustedIndex].color
+                surfaceTintColor: Color(taskController.categories[adjustedIndex].color)
                     .withOpacity(0.15),
               ),
             );

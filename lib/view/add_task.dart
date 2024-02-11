@@ -167,9 +167,21 @@ class AddTask extends StatelessWidget {
                 height: 30,
               ),
               CustomButton(
-                text: "Create Task",
-                onPressed: () {},
-              )
+                  text: "Create Task",
+                  onPressed: () async {
+                    await taskController.createTask(
+                      context: context,
+                      title: taskController.titleController.text,
+                      date: taskController.dateInput.text,
+                      startTime: taskController.startTimeInput.text,
+                      endTime: taskController.endTimeInput.text,
+                      category: taskController
+                          .categories[taskController.chipIndex.value],
+                      priority: taskController.selectedPriority.value,
+                      isRemind: taskController.isRemind.value,
+                      subTasks: [],
+                    );
+                  })
             ],
           ),
         ),
