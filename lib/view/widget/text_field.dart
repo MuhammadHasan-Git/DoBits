@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
     this.textAlign = TextAlign.start,
     this.readOnly = false,
     this.color = white,
+    this.validator,
   });
 
   final String? hintText;
@@ -22,6 +23,8 @@ class CustomTextField extends StatelessWidget {
   final bool? readOnly;
 
   final Function()? onTap;
+
+  final String? Function(String?)? validator;
 
   final TextAlign? textAlign;
 
@@ -43,9 +46,8 @@ class CustomTextField extends StatelessWidget {
         ),
         cursorColor: blue,
         onTap: onTap,
-        onTapOutside: (event) {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
+        
+        validator: validator,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: white.withOpacity(0.5)),
@@ -53,7 +55,7 @@ class CustomTextField extends StatelessWidget {
           filled: true,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-          enabledBorder: const OutlineInputBorder(
+          border: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
             borderSide: BorderSide(
               color: Colors.transparent,

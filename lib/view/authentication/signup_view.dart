@@ -20,12 +20,12 @@ class SignupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.put(AuthController());
-    final user = Get.put(UserController());
+    final userController = Get.put(UserController());
     final nameController = TextEditingController();
     final emailController = TextEditingController();
     final passController = TextEditingController();
     final confirmPassController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
+    final _formKey = GlobalKey<FormState>();
     return Scaffold(
       body: Padding(
         padding:
@@ -33,7 +33,7 @@ class SignupView extends StatelessWidget {
         child: SingleChildScrollView(
           child: SafeArea(
             child: Form(
-              key: formKey,
+              key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -174,9 +174,9 @@ class SignupView extends StatelessWidget {
                   CustomButton(
                     text: "SignUp",
                     onPressed: () async {
-                      if (formKey.currentState!.validate()) {
-                        await user.signUp(nameController, emailController,
-                            passController, context);
+                      if (_formKey.currentState!.validate()) {
+                        await userController.signUp(nameController,
+                            emailController, passController, context);
                       }
                     },
                   ),
@@ -211,12 +211,26 @@ class SignupView extends StatelessWidget {
                   ListTile(
                     onTap: () async {
                       final userController = Get.put(UserController());
-                      showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) =>
-                              const Center(child: CircularProgressIndicator()));
                       try {
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const CircularProgressIndicator(
+                                      color: darkBlue,
+                                    ),
+                                    SizedBox(
+                                      height: 3.0.wp,
+                                    ),
+                                    const Text(
+                                      "Processing...",
+                                      style: TextStyle(color: blue),
+                                    )
+                                  ],
+                                ));
                         final user = await userController.loginWithGoogle();
                         if (user != null) {
                           userController.createUser(
@@ -289,6 +303,33 @@ class SignupView extends StatelessWidget {
                       fit: BoxFit.cover,
                       width: 30,
                       height: 30,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5.0.wp,
+                  ),
+                  ListTile(
+                    onTap: () => userController.signInAnon(context),
+                    shape: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: white.withOpacity(0.5),
+                      ),
+                    ),
+                    title: const Center(
+                      child: Text(
+                        "Continue as Guest",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: white,
+                        ),
+                      ),
+                    ),
+                    leading: Icon(
+                      Icons.person,
+                      color: white.withOpacity(0.5),
+                      size: 35,
                     ),
                   ),
                   SizedBox(

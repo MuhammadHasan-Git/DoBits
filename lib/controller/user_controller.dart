@@ -1,13 +1,29 @@
 import 'dart:developer';
-
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:todo_app/main.dart';
+import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/utils/extensions.dart';
 
 class UserController extends GetxController {
+  static Future<String?> getId() async {
+    var deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isIOS) {
+      var iosDeviceInfo = await deviceInfo.iosInfo;
+      return iosDeviceInfo.identifierForVendor;
+    } else if (Platform.isAndroid) {
+      var androidDeviceInfo = await deviceInfo.androidInfo;
+      return androidDeviceInfo.id;
+    }
+    return null;
+  }
+
   Future<DateTime?> getAccountCreationTime() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     DateTime? creationTime;
@@ -51,6 +67,18 @@ class UserController extends GetxController {
     });
   }
 
+  void createGuest() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final String? id = await getId();
+    final userRef = firestore.collection("Guest").doc(id);
+    await userRef.set(
+      {
+        "userId": id,
+        'createdOn': FieldValue.serverTimestamp(),
+      },
+    );
+  }
+
   Future<void> signUp(
       TextEditingController nameController,
       TextEditingController emailController,
@@ -78,15 +106,66 @@ class UserController extends GetxController {
     navigatorKey.currentState!.popUntil((route) => route.isFirst);
   }
 
+  Future<void> signInAnon(BuildContext context) async {
+    try {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    color: darkBlue,
+                  ),
+                  SizedBox(
+                    height: 3.0.wp,
+                  ),
+                  const Text(
+                    "Logging in...",
+                    style: TextStyle(color: blue),
+                  )
+                ],
+              ));
+      final auth = FirebaseAuth.instance;
+      await auth.signInAnonymously();
+      createGuest();
+    } on FirebaseAuthException catch (e) {
+      Get.showSnackbar(
+        GetSnackBar(
+          message: e.message,
+          title: "Failed to Login as Guest",
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+    navigatorKey.currentState!.popUntil((route) => route.isFirst);
+  }
+
   Future<void> signIn(TextEditingController emailController,
       TextEditingController passwordController, context) async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()));
     FirebaseAuth auth = FirebaseAuth.instance;
 
     try {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    color: darkBlue,
+                  ),
+                  SizedBox(
+                    height: 3.0.wp,
+                  ),
+                  const Text(
+                    "Logging in...",
+                    style: TextStyle(color: blue),
+                  )
+                ],
+              ));
       await auth.signInWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim());

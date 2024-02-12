@@ -1,15 +1,20 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/dialog_content.dart';
 
 class TaskController extends GetxController {
+  static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   static String formatTime(TimeOfDay time) {
     final now = DateTime.now();
     final dateTime =
@@ -20,7 +25,7 @@ class TaskController extends GetxController {
   RxList<TaskCategory> categories = [
     TaskCategory(
       name: 'Personal',
-      color:  0xff42A5F5,
+      color: 0xff42A5F5,
     ),
     TaskCategory(
       name: 'Work',
@@ -44,7 +49,7 @@ class TaskController extends GetxController {
     ),
     TaskCategory(
       name: 'Finance',
-      color:0xff3F51B,
+      color: 0xff3F51B,
     ),
   ].obs;
 
@@ -56,6 +61,7 @@ class TaskController extends GetxController {
   RxBool isRemind = true.obs;
 
   final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
   final dateInput = TextEditingController(
     text: DateFormat('E, MMM d yyyy').format(DateTime.now()),
   );
@@ -192,14 +198,35 @@ class TaskController extends GetxController {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()));
+        builder: (context) => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(
+                  color: darkBlue,
+                ),
+                SizedBox(
+                  height: 3.0.wp,
+                ),
+                const Text(
+                  "Creating Task...",
+                  style: TextStyle(color: blue),
+                )
+              ],
+            ));
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
-    final taskRef = firestore
-        .collection("Users")
-        .doc(auth.currentUser!.uid)
-        .collection("Tasks")
-        .doc();
+    final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
+        ? firestore
+            .collection("Guest")
+            .doc(await UserController.getId())
+            .collection("Tasks")
+            .doc()
+        : firestore
+            .collection("Users")
+            .doc(auth.currentUser!.uid)
+            .collection("Tasks")
+            .doc();
     final task = Task(
       id: taskRef.id,
       title: title,
@@ -213,6 +240,7 @@ class TaskController extends GetxController {
       subTasks: subTasks,
       createdOn: FieldValue.serverTimestamp(),
     );
+    log(task.category.color.toString());
     try {
       await taskRef.set({
         'id': taskRef.id,
@@ -223,7 +251,7 @@ class TaskController extends GetxController {
         'startTime': task.startTime,
         'endTime': task.endTime,
         'categoryName': task.category.name,
-        'categoryColor': task.category.color,
+        'categoryColor': task.category.color.toString(),
         'priority': task.priority,
         'isRemind': task.isRemind,
         'subTasks': task.subTasks,

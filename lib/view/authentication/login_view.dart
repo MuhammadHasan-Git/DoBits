@@ -153,12 +153,26 @@ class LoginView extends StatelessWidget {
                   ),
                   ListTile(
                     onTap: () async {
-                      showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) =>
-                              const Center(child: CircularProgressIndicator()));
                       try {
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const CircularProgressIndicator(
+                                      color: darkBlue,
+                                    ),
+                                    SizedBox(
+                                      height: 3.0.wp,
+                                    ),
+                                    const Text(
+                                      "Processing...",
+                                      style: TextStyle(color: blue),
+                                    )
+                                  ],
+                                ));
                         final user = await userController.loginWithGoogle();
                         if (user != null) {
                           userController.createUser(
@@ -218,7 +232,7 @@ class LoginView extends StatelessWidget {
                     ),
                     title: const Center(
                       child: Text(
-                        "Log in with Google",
+                        "Continue With Google",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -229,8 +243,35 @@ class LoginView extends StatelessWidget {
                     leading: Image.asset(
                       "assets/images/google_logo.png",
                       fit: BoxFit.cover,
-                      width: 30,
-                      height: 30,
+                      width: 35,
+                      height: 35,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5.0.wp,
+                  ),
+                  ListTile(
+                    onTap: () => userController.signInAnon(context).then((value) => null),
+                    shape: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: white.withOpacity(0.5),
+                      ),
+                    ),
+                    title: const Center(
+                      child: Text(
+                        "Continue as Guest",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: white,
+                        ),
+                      ),
+                    ),
+                    leading: Icon(
+                      Icons.person,
+                      color: white.withOpacity(0.5),
+                      size: 35,
                     ),
                   ),
                   SizedBox(
