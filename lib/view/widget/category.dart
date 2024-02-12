@@ -64,7 +64,8 @@ class CategoryList extends StatelessWidget {
                   taskController.categories[adjustedIndex].name,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Color(taskController.categories[adjustedIndex].color),
+                    color:
+                        Color(taskController.categories[adjustedIndex].color),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -79,8 +80,9 @@ class CategoryList extends StatelessWidget {
                   Color(taskController.categories[adjustedIndex].color)
                       .withOpacity(0.15),
                 ),
-                surfaceTintColor: Color(taskController.categories[adjustedIndex].color)
-                    .withOpacity(0.15),
+                surfaceTintColor:
+                    Color(taskController.categories[adjustedIndex].color)
+                        .withOpacity(0.15),
               ),
             );
           }

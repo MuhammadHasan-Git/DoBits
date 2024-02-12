@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/controller.dart';
 import 'package:todo_app/firebase_options.dart';
@@ -30,6 +31,7 @@ void main() async {
       ),
     ),
     debugShowCheckedModeBanner: false,
+    builder: FToastBuilder(),
     navigatorKey: navigatorKey,
     home: const Auth(),
   ));

@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/controller/user_controller.dart';
@@ -49,7 +48,7 @@ class TaskController extends GetxController {
     ),
     TaskCategory(
       name: 'Finance',
-      color: 0xff3F51B,
+      color: 0xff3F51B5,
     ),
   ].obs;
 
@@ -76,7 +75,7 @@ class TaskController extends GetxController {
   Rx<int> selectedColor = 0xff778CDD.obs;
   RxInt buttonIndex = 0.obs;
 
-  addCategory(String name, Rx<int> color, context) {
+  void addCategory(String name, Rx<int> color, context) {
     categories.add(TaskCategory(color: color.value, name: name));
     Navigator.of(context).pop();
     selectedColor.value = 0xff778CDD;
@@ -89,6 +88,45 @@ class TaskController extends GetxController {
       categories.remove(categories[index]);
     } else {
       null;
+    }
+  }
+
+  createCategory(TaskCategory category) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
+        ? firestore
+            .collection("Guest")
+            .doc(await UserController.getId())
+            .collection("Categories")
+            .doc()
+        : firestore
+            .collection("Users")
+            .doc(auth.currentUser!.uid)
+            .collection("Categories")
+            .doc();
+    try {
+      await taskRef.set({
+        'name': category.name,
+        'color': category.color,
+      });
+      Fluttertoast.showToast(
+          msg: "Category created successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } on FirebaseAuthException {
+      Fluttertoast.showToast(
+          msg: "Failed to create category",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -198,21 +236,24 @@ class TaskController extends GetxController {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(
-                  color: darkBlue,
-                ),
-                SizedBox(
-                  height: 3.0.wp,
-                ),
-                const Text(
-                  "Creating Task...",
-                  style: TextStyle(color: blue),
-                )
-              ],
+        builder: (context) => Material(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    color: darkBlue,
+                  ),
+                  SizedBox(
+                    height: 3.0.wp,
+                  ),
+                  const Text(
+                    "Creating...",
+                    style: TextStyle(color: blue),
+                  )
+                ],
+              ),
             ));
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -240,7 +281,7 @@ class TaskController extends GetxController {
       subTasks: subTasks,
       createdOn: FieldValue.serverTimestamp(),
     );
-    log(task.category.color.toString());
+
     try {
       await taskRef.set({
         'id': taskRef.id,
@@ -256,15 +297,24 @@ class TaskController extends GetxController {
         'isRemind': task.isRemind,
         'subTasks': task.subTasks,
       });
-    } on FirebaseAuthException catch (error) {
-      Get.back();
-      Get.showSnackbar(
-        GetSnackBar(
-          message: error.message,
-          title: "Failed to create task",
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      await Fluttertoast.showToast(
+          msg: "Task created successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } on FirebaseAuthException {
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
+      Fluttertoast.showToast(
+          msg: "Failed to create task",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
     navigatorKey.currentState!.popUntil((route) => route.isFirst);
   }
