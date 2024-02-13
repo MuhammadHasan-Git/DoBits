@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:todo_app/controller/controller.dart';
 import 'package:todo_app/firebase_options.dart';
 import 'package:todo_app/utils/colors.dart';
-import 'package:todo_app/view/authentication/auth.dart';
+import 'package:todo_app/view/authentication/login_options.dart';
 import 'package:todo_app/view/home_page.dart';
 
 void main() async {
@@ -33,7 +34,23 @@ void main() async {
     debugShowCheckedModeBanner: false,
     builder: FToastBuilder(),
     navigatorKey: navigatorKey,
-    home: const Auth(),
+    home: StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.none) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(
+            child: Text("Something Went Wrong!"),
+          );
+        }
+        if (snapshot.hasData) {
+          return const MyApp();
+        } else {
+          return const LoginOptions();
+        }
+      },
+    ),
   ));
 }
 

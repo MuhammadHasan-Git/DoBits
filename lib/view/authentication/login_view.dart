@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +7,12 @@ import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
+import 'package:todo_app/view/authentication/widgets/google_signin.dart';
 import 'package:todo_app/view/authentication/widgets/text_field.dart';
-import 'package:todo_app/view/home_page.dart';
 import 'package:todo_app/view/widget/button.dart';
 
 class LoginView extends StatelessWidget {
-  final Function toggleView;
+  final Function? toggleView;
   const LoginView({super.key, required this.toggleView});
 
   @override
@@ -25,297 +23,220 @@ class LoginView extends StatelessWidget {
     final passController = TextEditingController();
     final _formKey = GlobalKey<FormState>();
     return Scaffold(
-      body: Padding(
-        padding:
-            const EdgeInsets.only(top: 50, left: 15, right: 15, bottom: 10),
-        child: SingleChildScrollView(
-          child: SafeArea(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Welcome back!",
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 1.0.wp,
-                  ),
-                  Text(
-                    "Signin to your account",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: white.withOpacity(0.5),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  AuthTextField(
-                    hintText: "Enter your Email",
-                    icon: const Icon(Icons.email),
-                    keyboardType: TextInputType.emailAddress,
-                    controller: emailController,
-                    obscureText: false,
-                    validator: (value) {
-                      return authController.emailValidator(value);
-                    },
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Obx(
-                    () => AuthTextField(
-                      hintText: "Enter your password",
-                      icon: const Icon(Icons.lock),
-                      controller: passController,
-                      obscureText: authController.isVisibleLogin.value,
-                      onchanged: (value) {
-                        if (value.isNotEmpty) {
-                          authController.isEmptyLogin.value = false;
-                        } else {
-                          authController.isEmptyLogin.value = true;
-                        }
-                      },
-                      suffixIcon: authController.isEmptyLogin.value
-                          ? null
-                          : IconButton(
-                              splashRadius: 1,
-                              icon: Icon(
-                                authController.isVisibleLogin.value
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                size: 25,
-                              ),
-                              onPressed: () => authController.isVisibleLogin
-                                  .value = !authController.isVisibleLogin.value,
-                            ),
-                      validator: (String? value) {
-                        return authController.passValidator(value);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 4.0.wp,
-                  ),
-                  const Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: blue,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15.0.wp,
-                  ),
-                  CustomButton(
-                      text: "Log In",
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          userController.signIn(
-                              emailController, passController, context);
-                        }
-                      }),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Divider(
-                        color: white.withOpacity(0.5),
-                      )),
-                      SizedBox(
-                        width: 3.0.wp,
-                      ),
-                      const Text(
-                        "OR",
-                        style: TextStyle(color: white),
-                      ),
-                      SizedBox(
-                        width: 3.0.wp,
-                      ),
-                      Expanded(
-                          child: Divider(
-                        color: white.withOpacity(0.5),
-                      )),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  ListTile(
-                    onTap: () async {
-                      try {
-                        showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) => Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const CircularProgressIndicator(
-                                      color: darkBlue,
-                                    ),
-                                    SizedBox(
-                                      height: 3.0.wp,
-                                    ),
-                                    const Text(
-                                      "Processing...",
-                                      style: TextStyle(color: blue),
-                                    )
-                                  ],
-                                ));
-                        final user = await userController.loginWithGoogle();
-                        if (user != null) {
-                          userController.createUser(
-                              user.displayName!, user.email!);
-                          Get.to(() => const HomePage());
-                        } else {}
-                      } on FirebaseAuthException catch (error) {
-                        log(error.message.toString());
-                        if (error.code ==
-                            'account-exists-with-different-credential') {
-                          Get.showSnackbar(
-                            const GetSnackBar(
-                              message:
-                                  'The account already exists with a different credential',
-                              title: "Failed to Sign in with Google",
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } else if (error.code == 'invalid-credential') {
-                          Get.showSnackbar(
-                            const GetSnackBar(
-                              message:
-                                  'Error occurred while accessing credentials. Try again.',
-                              title: "Failed to Sign in with Google",
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } else {
-                          Get.showSnackbar(
-                            GetSnackBar(
-                              message: error.message,
-                              title: "Failed to Sign in with Google",
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      } catch (error) {
-                        log(error.toString());
-                        Get.showSnackbar(
-                          const GetSnackBar(
-                            message:
-                                'Error occurred using Google Sign In. Try again.',
-                            title: "Failed to Sign in with Google",
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      }
-
-                      navigatorKey.currentState!
-                          .popUntil((route) => route.isFirst);
-                    },
-                    shape: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: white.withOpacity(0.5),
-                      ),
-                    ),
-                    title: const Center(
-                      child: Text(
-                        "Continue With Google",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: white,
-                        ),
-                      ),
-                    ),
-                    leading: Image.asset(
-                      "assets/images/google_logo.png",
-                      fit: BoxFit.cover,
-                      width: 35,
-                      height: 35,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5.0.wp,
-                  ),
-                  ListTile(
-                    onTap: () => userController.signInAnon(context).then((value) => null),
-                    shape: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: white.withOpacity(0.5),
-                      ),
-                    ),
-                    title: const Center(
-                      child: Text(
-                        "Continue as Guest",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: white,
-                        ),
-                      ),
-                    ),
-                    leading: Icon(
-                      Icons.person,
-                      color: white.withOpacity(0.5),
-                      size: 35,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.0.wp,
-                  ),
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
+      body: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.none) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Center(
+                child: Text("Something Went Wrong!"),
+              );
+            }
+            if (snapshot.hasData) {
+              return const MyApp();
+            } else {
+              return Padding(
+                padding: const EdgeInsets.only(
+                    top: 50, left: 15, right: 15, bottom: 10),
+                child: SingleChildScrollView(
+                  child: SafeArea(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const TextSpan(
-                            text: "Don't have an account?",
+                          const Text(
+                            "Welcome back!",
+                            style: TextStyle(
+                              fontSize: 30,
+                              color: white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.0.wp,
+                          ),
+                          Text(
+                            "Signin to your account",
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: white,
+                              color: white.withOpacity(0.5),
                             ),
                           ),
-                          const WidgetSpan(
-                            child: SizedBox(width: 3),
+                          const SizedBox(
+                            height: 30,
                           ),
-                          TextSpan(
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                final authController =
-                                    Get.put(AuthController());
-                                authController.toggleView();
+                          AuthTextField(
+                            hintText: "Enter your Email",
+                            icon: const Icon(Icons.email),
+                            keyboardType: TextInputType.emailAddress,
+                            controller: emailController,
+                            obscureText: false,
+                            validator: (value) {
+                              return authController.emailValidator(value);
+                            },
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Obx(
+                            () => AuthTextField(
+                              hintText: "Enter your password",
+                              icon: const Icon(Icons.lock),
+                              controller: passController,
+                              obscureText: authController.isVisibleLogin.value,
+                              onchanged: (value) {
+                                if (value.isNotEmpty) {
+                                  authController.isEmptyLogin.value = false;
+                                } else {
+                                  authController.isEmptyLogin.value = true;
+                                }
                               },
-                            text: "Sign Up",
-                            style: const TextStyle(
-                              color: Colors.blueAccent,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              suffixIcon: authController.isEmptyLogin.value
+                                  ? null
+                                  : IconButton(
+                                      splashRadius: 1,
+                                      icon: Icon(
+                                        authController.isVisibleLogin.value
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                        size: 25,
+                                      ),
+                                      onPressed: () => authController
+                                              .isVisibleLogin.value =
+                                          !authController.isVisibleLogin.value,
+                                    ),
+                              validator: (String? value) {
+                                return authController.passValidator(value);
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            height: 4.0.wp,
+                          ),
+                          const Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "Forgot Password?",
+                              style: TextStyle(
+                                color: blue,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 15.0.wp,
+                          ),
+                          CustomButton(
+                              text: "Log In",
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  userController.signIn(
+                                      emailController, passController, context);
+                                }
+                              }),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Divider(
+                                color: white.withOpacity(0.5),
+                              )),
+                              SizedBox(
+                                width: 3.0.wp,
+                              ),
+                              const Text(
+                                "OR",
+                                style: TextStyle(color: white),
+                              ),
+                              SizedBox(
+                                width: 3.0.wp,
+                              ),
+                              Expanded(
+                                  child: Divider(
+                                color: white.withOpacity(0.5),
+                              )),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 25,
+                          ),
+                          const GoogleSignInButton(),
+                          SizedBox(
+                            height: 5.0.wp,
+                          ),
+                          ListTile(
+                            onTap: () => userController
+                                .signInAnon(context)
+                                .then((value) => null),
+                            shape: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: white.withOpacity(0.5),
+                              ),
+                            ),
+                            title: const Center(
+                              child: Text(
+                                "Continue as Guest",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: white,
+                                ),
+                              ),
+                            ),
+                            leading: Icon(
+                              Icons.person,
+                              color: white.withOpacity(0.5),
+                              size: 35,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10.0.wp,
+                          ),
+                          Center(
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Don't have an account?",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: white,
+                                    ),
+                                  ),
+                                  const WidgetSpan(
+                                    child: SizedBox(width: 3),
+                                  ),
+                                  TextSpan(
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        final authController =
+                                            Get.put(AuthController());
+                                        authController.toggleView();
+                                      },
+                                    text: "Sign Up",
+                                    style: const TextStyle(
+                                      color: Colors.blueAccent,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+                ),
+              );
+            }
+          }),
     );
   }
 }

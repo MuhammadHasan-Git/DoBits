@@ -210,11 +210,13 @@ class TaskController extends GetxController {
               },
             ),
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: darkBlue),
-              child: const Text('Create'),
-              onPressed: () =>
-                  addCategory(categoryName.text, selectedColor, context),
-            ),
+                style: TextButton.styleFrom(foregroundColor: darkBlue),
+                child: const Text('Create'),
+                onPressed: () {
+                  final category = TaskCategory(
+                      color: selectedColor.value, name: categoryName.text);
+                  createCategory(category);
+                }),
           ],
         );
       },

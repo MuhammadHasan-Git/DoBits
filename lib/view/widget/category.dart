@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/task_controller.dart';
@@ -18,7 +19,12 @@ class CategoryList extends StatelessWidget {
           if (index == 0) {
             return InkWell(
               onTap: () {
-                taskController.dialogBuilder(context);
+                if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                  Get.back();
+                  // Get.to(() => const Auth(), transition: Transition.downToUp);
+                } else {
+                  taskController.dialogBuilder(context);
+                }
               },
               splashFactory: NoSplash.splashFactory,
               overlayColor: const MaterialStatePropertyAll(Colors.transparent),
@@ -84,6 +90,19 @@ class CategoryList extends StatelessWidget {
                     Color(taskController.categories[adjustedIndex].color)
                         .withOpacity(0.15),
               ),
+              // child: StreamBuilder(
+              //     stream: FirebaseAuth.instance.currentUser!.isAnonymous
+              //         ? firestore
+              //             .collection("Guest")
+              //             .doc(UserController.getId())
+              //             .collection("Categories")
+              //             .snapshots()
+              //         : firestore
+              //             .collection("Users")
+              //             .doc(auth.currentUser!.uid)
+              //             .collection("Categories")
+              //             .snapshots(),
+              //     builder: builder),
             );
           }
         }),

@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
+import 'package:todo_app/view/home_page.dart';
 
 class UserController extends GetxController {
   static Future<String?> getId() async {
@@ -187,19 +188,80 @@ class UserController extends GetxController {
     await GoogleSignIn().signOut();
   }
 
-  Future<User?> loginWithGoogle() async {
-    final googleAccount = await GoogleSignIn().signIn();
-
-    final googleAuth = await googleAccount?.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-
-    final userCredentail =
-        await FirebaseAuth.instance.signInWithCredential(credential);
-
-    return userCredentail.user;
+  Future loginWithGoogle(context) async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(
+                  color: darkBlue,
+                ),
+                SizedBox(
+                  height: 3.0.wp,
+                ),
+                const Text(
+                  "Processing...",
+                  style: TextStyle(color: blue),
+                )
+              ],
+            ));
+    try {
+      final googleAccount = await GoogleSignIn().signIn();
+      final googleAuth = await googleAccount?.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      final userCredentail =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final user = userCredentail.user;
+      if (user != null) {
+        createUser(user.displayName!, user.email!);
+        Get.to(() => const HomePage());
+      } else {}
+    } on FirebaseAuthException catch (error) {
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
+      if (error.code == 'account-exists-with-different-credential') {
+        Get.showSnackbar(
+          const GetSnackBar(
+            message: 'The account already exists with a different credential',
+            title: "Failed to Sign in with Google",
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else if (error.code == 'invalid-credential') {
+        navigatorKey.currentState!.popUntil((route) => route.isFirst);
+        Get.showSnackbar(
+          const GetSnackBar(
+            message: 'Error occurred while accessing credentials. Try again.',
+            title: "Failed to Sign in with Google",
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        navigatorKey.currentState!.popUntil((route) => route.isFirst);
+        Get.showSnackbar(
+          GetSnackBar(
+            message: error.message,
+            title: "Failed to Sign in with Google",
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (error) {
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
+      log(error.toString());
+      Get.showSnackbar(
+        const GetSnackBar(
+          message: 'Error occurred using Google Sign In. Try again.',
+          title: "Failed to Sign in with Google",
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+    navigatorKey.currentState!.popUntil((route) => route.isFirst);
   }
 }
