@@ -16,11 +16,10 @@ class GoogleSignInButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           onTap: () => userController.loginWithGoogle(context),
           child: Container(
+            width: Get.width * 0.7,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             decoration: BoxDecoration(
-                border: Border.all(
-                  color: white.withOpacity(0.35),
-                ),
+                border: Border.all(color: white.withOpacity(0.35)),
                 borderRadius: BorderRadius.circular(30)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -28,8 +27,8 @@ class GoogleSignInButton extends StatelessWidget {
                 Image.asset(
                   "assets/images/google_logo.png",
                   fit: BoxFit.cover,
-                  width: 35,
-                  height: 35,
+                  width: 30,
+                  height: 30,
                 ),
                 const SizedBox(
                   width: 10,

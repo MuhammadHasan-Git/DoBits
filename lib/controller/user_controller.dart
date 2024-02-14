@@ -9,7 +9,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
-import 'package:todo_app/view/home_page.dart';
 
 class UserController extends GetxController {
   static Future<String?> getId() async {
@@ -220,8 +219,7 @@ class UserController extends GetxController {
       final user = userCredentail.user;
       if (user != null) {
         createUser(user.displayName!, user.email!);
-        Get.to(() => const HomePage());
-      } else {}
+      }
     } on FirebaseAuthException catch (error) {
       navigatorKey.currentState!.popUntil((route) => route.isFirst);
       if (error.code == 'account-exists-with-different-credential') {
@@ -254,13 +252,6 @@ class UserController extends GetxController {
     } catch (error) {
       navigatorKey.currentState!.popUntil((route) => route.isFirst);
       log(error.toString());
-      Get.showSnackbar(
-        const GetSnackBar(
-          message: 'Error occurred using Google Sign In. Try again.',
-          title: "Failed to Sign in with Google",
-          duration: Duration(seconds: 2),
-        ),
-      );
     }
     navigatorKey.currentState!.popUntil((route) => route.isFirst);
   }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
+import 'package:todo_app/view/authentication/login_options.dart';
 
 class CategoryList extends StatelessWidget {
   const CategoryList({super.key});
@@ -20,8 +21,11 @@ class CategoryList extends StatelessWidget {
             return InkWell(
               onTap: () {
                 if (FirebaseAuth.instance.currentUser!.isAnonymous) {
-                  Get.back();
-                  // Get.to(() => const Auth(), transition: Transition.downToUp);
+                  Get.to(
+                      () => const LoginOptions(
+                            isGuest: true,
+                          ),
+                      transition: Transition.downToUp);
                 } else {
                   taskController.dialogBuilder(context);
                 }

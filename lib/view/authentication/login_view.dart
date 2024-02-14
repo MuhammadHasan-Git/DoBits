@@ -8,6 +8,7 @@ import 'package:todo_app/main.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/authentication/widgets/google_signin.dart';
+import 'package:todo_app/view/authentication/widgets/guest_signin.dart';
 import 'package:todo_app/view/authentication/widgets/text_field.dart';
 import 'package:todo_app/view/widget/button.dart';
 
@@ -38,7 +39,7 @@ class LoginView extends StatelessWidget {
             } else {
               return Padding(
                 padding: const EdgeInsets.only(
-                    top: 50, left: 15, right: 15, bottom: 10),
+                    top: 50, left: 15, right: 15, bottom: 20),
                 child: SingleChildScrollView(
                   child: SafeArea(
                     child: Form(
@@ -57,11 +58,11 @@ class LoginView extends StatelessWidget {
                           SizedBox(
                             height: 1.0.wp,
                           ),
-                          Text(
+                          const Text(
                             "Signin to your account",
                             style: TextStyle(
                               fontSize: 16,
-                              color: white.withOpacity(0.5),
+                              color: grey,
                             ),
                           ),
                           const SizedBox(
@@ -140,9 +141,9 @@ class LoginView extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                   child: Divider(
-                                color: white.withOpacity(0.5),
+                                color: grey,
                               )),
                               SizedBox(
                                 width: 3.0.wp,
@@ -154,9 +155,9 @@ class LoginView extends StatelessWidget {
                               SizedBox(
                                 width: 3.0.wp,
                               ),
-                              Expanded(
+                              const Expanded(
                                   child: Divider(
-                                color: white.withOpacity(0.5),
+                                color: grey,
                               )),
                             ],
                           ),
@@ -167,34 +168,9 @@ class LoginView extends StatelessWidget {
                           SizedBox(
                             height: 5.0.wp,
                           ),
-                          ListTile(
-                            onTap: () => userController
-                                .signInAnon(context)
-                                .then((value) => null),
-                            shape: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: white.withOpacity(0.5),
-                              ),
-                            ),
-                            title: const Center(
-                              child: Text(
-                                "Continue as Guest",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: white,
-                                ),
-                              ),
-                            ),
-                            leading: Icon(
-                              Icons.person,
-                              color: white.withOpacity(0.5),
-                              size: 35,
-                            ),
-                          ),
+                          const GuestSignInButton(),
                           SizedBox(
-                            height: 10.0.wp,
+                            height: 15.0.wp,
                           ),
                           Center(
                             child: RichText(

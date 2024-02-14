@@ -7,6 +7,7 @@ import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/authentication/login_view.dart';
 import 'package:todo_app/view/authentication/signup_view.dart';
 import 'package:todo_app/view/authentication/widgets/google_signin.dart';
+import 'package:todo_app/view/authentication/widgets/guest_signin.dart';
 import 'package:todo_app/view/widget/button.dart';
 import '../../controller/auth_controller.dart';
 
@@ -20,7 +21,11 @@ class LoginOptions extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+          padding: const EdgeInsets.only(
+            left: 15,
+            right: 15,
+            bottom: 20,
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -43,12 +48,28 @@ class LoginOptions extends StatelessWidget {
                   height: 300,
                   width: double.infinity,
                 ),
-                const Text(
-                  "Welcome",
+                Text(
+                  isGuest! ? "LogIn to Access This Feature" : "Sign In Options",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: darkBlue,
                     letterSpacing: 2,
-                    fontSize: 24,
+                    fontSize: isGuest! ? 20 : 24,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                SizedBox(
+                  height: 1.0.wp,
+                ),
+                Text(
+                  isGuest!
+                      ? "To access this feature, please log in to your account."
+                      : "Choose Your Preferred Sign-In Method",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: grey,
+                    letterSpacing: 1,
+                    fontSize: 14,
                     fontWeight: FontWeight.w100,
                   ),
                 ),
@@ -58,24 +79,15 @@ class LoginOptions extends StatelessWidget {
                 CustomButton(
                   text: "Login",
                   onPressed: () => Get.to(
-                      () => Obx(() => authController.showSignIn.value
-                          ? LoginView(
-                              toggleView: () => authController.toggleView())
-                          : SignupView(
-                              toggleView: () => authController.toggleView())),
-                      transition: Transition.downToUp),
-                ),
-                SizedBox(
-                  height: 6.0.wp,
-                ),
-                CustomButton(
-                  text: "Signup",
-                  onPressed: () => Get.to(
-                      () => Obx(() => authController.showSignIn.value
-                          ? LoginView(
-                              toggleView: () => authController.toggleView())
-                          : SignupView(
-                              toggleView: () => authController.toggleView())),
+                      () => Obx(
+                            () => authController.showSignIn.value
+                                ? LoginView(
+                                    toggleView: () =>
+                                        authController.toggleView())
+                                : SignupView(
+                                    toggleView: () =>
+                                        authController.toggleView()),
+                          ),
                       transition: Transition.downToUp),
                 ),
                 SizedBox(
@@ -83,9 +95,9 @@ class LoginOptions extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                         child: Divider(
-                      color: white.withOpacity(0.5),
+                      color: grey,
                       indent: 25,
                     )),
                     SizedBox(
@@ -98,9 +110,9 @@ class LoginOptions extends StatelessWidget {
                     SizedBox(
                       width: 3.0.wp,
                     ),
-                    Expanded(
+                    const Expanded(
                         child: Divider(
-                      color: white.withOpacity(0.5),
+                      color: grey,
                       endIndent: 25,
                     )),
                   ],
@@ -108,9 +120,11 @@ class LoginOptions extends StatelessWidget {
                 SizedBox(
                   height: 10.0.wp,
                 ),
-
-                // ),
                 const GoogleSignInButton(),
+                SizedBox(
+                  height: 5.0.wp,
+                ),
+                const GuestSignInButton(),
                 SizedBox(
                   height: 15.0.wp,
                 ),
@@ -119,7 +133,7 @@ class LoginOptions extends StatelessWidget {
                     text: TextSpan(
                       children: [
                         const TextSpan(
-                          text: "Login as",
+                          text: "Don't have an account?",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -132,10 +146,19 @@ class LoginOptions extends StatelessWidget {
                         TextSpan(
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              final authController = Get.put(AuthController());
-                              authController.toggleView();
+                              Get.to(
+                                  () => Obx(
+                                        () => authController.showSignIn.value
+                                            ? LoginView(
+                                                toggleView: () =>
+                                                    authController.toggleView())
+                                            : SignupView(
+                                                toggleView: () => authController
+                                                    .toggleView()),
+                                      ),
+                                  transition: Transition.downToUp);
                             },
-                          text: "Guest",
+                          text: "Sign Up",
                           style: const TextStyle(
                             color: Colors.blueAccent,
                             fontSize: 16,
