@@ -4,7 +4,7 @@ import 'package:todo_app/utils/colors.dart';
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
-    required this.width,
+    this.width = double.infinity,
     required this.controller,
     this.hintText,
     this.onTap,
@@ -16,7 +16,7 @@ class CustomTextField extends StatelessWidget {
 
   final String? hintText;
 
-  final double width;
+  final double? width;
 
   final Color? color;
 
@@ -46,7 +46,6 @@ class CustomTextField extends StatelessWidget {
         ),
         cursorColor: blue,
         onTap: onTap,
-        
         validator: validator,
         decoration: InputDecoration(
           hintText: hintText,

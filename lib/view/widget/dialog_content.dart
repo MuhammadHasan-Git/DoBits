@@ -12,27 +12,33 @@ class DialogContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskController = Get.put(TaskController());
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Obx(
-          () => CustomTextField(
-            width: double.infinity,
-            controller: taskController.categoryName,
-            hintText: "Category Name",
-            color: Color(taskController.selectedColor.value),
+
+    return Form(
+      key: TaskController.categoryKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Obx(
+            () => CustomTextField(
+              width: double.infinity,
+              controller: taskController.categoryName,
+              hintText: "Category Name",
+              validator: (value) =>
+                  taskController.categoryFieldValidator(value),
+              color: Color(taskController.selectedColor.value),
+            ),
           ),
-        ),
-        SizedBox(
-          height: 5.0.wp,
-        ),
-        const Text(
-          "Select Color",
-          style: TextStyle(color: white, fontSize: 16),
-        ),
-        const ColorPicker(),
-      ],
+          SizedBox(
+            height: 5.0.wp,
+          ),
+          const Text(
+            "Select Color",
+            style: TextStyle(color: white, fontSize: 16),
+          ),
+          const ColorPicker(),
+        ],
+      ),
     );
   }
 }

@@ -7,8 +7,7 @@ class Task {
   final String title;
   final String date;
   final String? description;
-  final String startTime;
-  final String endTime;
+  final String time;
   final TaskCategory category;
   final String priority;
   final bool isRemind;
@@ -19,8 +18,7 @@ class Task {
       required this.title,
       required this.date,
       required this.description,
-      required this.startTime,
-      required this.endTime,
+      required this.time,
       required this.category,
       required this.priority,
       required this.isRemind,

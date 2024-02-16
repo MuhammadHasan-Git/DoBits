@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ import 'package:todo_app/view/widget/dialog_content.dart';
 
 class TaskController extends GetxController {
   static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  static final GlobalKey<FormState> categoryKey = GlobalKey<FormState>();
   static String formatTime(TimeOfDay time) {
     final now = DateTime.now();
     final dateTime =
@@ -54,8 +57,7 @@ class TaskController extends GetxController {
 
   String formattedDate = "";
   DateTime? selectedDate;
-  TimeOfDay? selectedStartTime;
-  TimeOfDay? selectedEndTime;
+  TimeOfDay? selectedTime;
   RxString selectedPriority = 'Low Priority'.obs;
   RxBool isRemind = true.obs;
 
@@ -64,10 +66,10 @@ class TaskController extends GetxController {
   final dateInput = TextEditingController(
     text: DateFormat('E, MMM d yyyy').format(DateTime.now()),
   );
-  final startTimeInput = TextEditingController(
+
+  final timeInput = TextEditingController(
       text: formatTime(const TimeOfDay(hour: 14, minute: 0)));
-  final endTimeInput = TextEditingController(
-      text: formatTime(const TimeOfDay(hour: 17, minute: 0)));
+
   final categoryName = TextEditingController();
 
   final chipIndex = 0.obs;
@@ -75,7 +77,7 @@ class TaskController extends GetxController {
   Rx<int> selectedColor = 0xff778CDD.obs;
   RxInt buttonIndex = 0.obs;
 
-  void addCategory(String name, Rx<int> color, context) {
+  void selectCategory(String name, Rx<int> color, context) {
     categories.add(TaskCategory(color: color.value, name: name));
     Navigator.of(context).pop();
     selectedColor.value = 0xff778CDD;
@@ -83,9 +85,16 @@ class TaskController extends GetxController {
     categoryName.clear();
   }
 
-  deleteCategory(index) {
+  deleteCategory(int index, id) async {
     if (index > 6) {
-      categories.remove(categories[index]);
+      log(id.toString());
+      log(index.toString());
+      // await FirebaseFirestore.instance
+      //     .collection("Users")
+      //     .doc(FirebaseAuth.instance.currentUser!.uid)
+      //     .collection("Categories")
+      //     .doc(ds.id)
+      //     .delete();
     } else {
       null;
     }
@@ -94,22 +103,21 @@ class TaskController extends GetxController {
   createCategory(TaskCategory category) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
-    final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
-        ? firestore
-            .collection("Guest")
-            .doc(await UserController.getId())
-            .collection("Categories")
-            .doc()
-        : firestore
-            .collection("Users")
-            .doc(auth.currentUser!.uid)
-            .collection("Categories")
-            .doc();
+    final taskRef = firestore
+        .collection("Users")
+        .doc(auth.currentUser!.uid)
+        .collection("Categories")
+        .doc();
     try {
       await taskRef.set({
         'name': category.name,
         'color': category.color,
+      }).then((_) {
+        categoryName.clear();
+        selectedColor.value = 0xff778CDD;
+        buttonIndex.value = 0;
       });
+      Get.back();
       Fluttertoast.showToast(
           msg: "Category created successfully!",
           toastLength: Toast.LENGTH_SHORT,
@@ -127,6 +135,14 @@ class TaskController extends GetxController {
           backgroundColor: Colors.black,
           textColor: Colors.white,
           fontSize: 16.0);
+    }
+  }
+
+  String? categoryFieldValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter category name';
+    } else {
+      return null;
     }
   }
 
@@ -162,21 +178,15 @@ class TaskController extends GetxController {
   }
 
   Future displayTimePicker(
-      BuildContext context, TextEditingController timeInput, int index) async {
+      BuildContext context, TextEditingController timeInput) async {
     TimeOfDay? initialTime;
-    if (index == 1) {
-      initialTime = selectedStartTime ?? TimeOfDay.now();
-    } else {
-      initialTime = selectedEndTime ?? TimeOfDay.now();
-    }
+
+    initialTime = selectedTime ?? TimeOfDay.now();
+
     TimeOfDay? pickedTime =
         await showTimePicker(context: context, initialTime: initialTime);
     if (pickedTime != null) {
-      if (index == 1) {
-        selectedStartTime = pickedTime;
-      } else {
-        selectedEndTime = pickedTime;
-      }
+      selectedTime = pickedTime;
       timeInput.text = formatTime(pickedTime);
     }
   }
@@ -213,9 +223,11 @@ class TaskController extends GetxController {
                 style: TextButton.styleFrom(foregroundColor: darkBlue),
                 child: const Text('Create'),
                 onPressed: () {
-                  final category = TaskCategory(
-                      color: selectedColor.value, name: categoryName.text);
-                  createCategory(category);
+                  if (categoryKey.currentState!.validate()) {
+                    final category = TaskCategory(
+                        color: selectedColor.value, name: categoryName.text);
+                    createCategory(category);
+                  }
                 }),
           ],
         );
@@ -228,8 +240,7 @@ class TaskController extends GetxController {
     required String title,
     required String date,
     String? description,
-    required String startTime,
-    required String endTime,
+    required String time,
     required TaskCategory category,
     required String priority,
     required bool isRemind,
@@ -275,8 +286,7 @@ class TaskController extends GetxController {
       title: title,
       date: date,
       description: description,
-      startTime: startTime,
-      endTime: endTime,
+      time: time,
       category: category,
       priority: priority,
       isRemind: isRemind,
@@ -291,8 +301,7 @@ class TaskController extends GetxController {
         'title': task.title,
         'date': task.date,
         'description': task.description,
-        'startTime': task.startTime,
-        'endTime': task.endTime,
+        'time': task.time,
         'categoryName': task.category.name,
         'categoryColor': task.category.color.toString(),
         'priority': task.priority,

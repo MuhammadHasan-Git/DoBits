@@ -3,6 +3,7 @@ import 'package:get/get_core/get_core.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/button.dart';
 import 'package:todo_app/view/widget/category.dart';
 import 'package:todo_app/view/widget/remind_widget.dart';
@@ -15,7 +16,6 @@ class AddTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskController = Get.put(TaskController());
-    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
@@ -57,20 +57,62 @@ class AddTask extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                const Text(
-                  "Date",
-                  style: TextStyle(
-                    color: white,
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                CustomTextField(
-                  width: double.infinity,
-                  controller: taskController.dateInput,
-                  readOnly: true,
-                  onTap: () => taskController.displayDatePicker(context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      flex: 6,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Date",
+                            style: TextStyle(
+                              color: white,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          CustomTextField(
+                            controller: taskController.dateInput,
+                            textAlign: TextAlign.center,
+                            readOnly: true,
+                            onTap: () =>
+                                taskController.displayDatePicker(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 12.0.wp,
+                    ),
+                    Flexible(
+                      flex: 4,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Time",
+                            style: TextStyle(
+                              color: white,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          CustomTextField(
+                            textAlign: TextAlign.center,
+                            controller: taskController.timeInput,
+                            readOnly: true,
+                            onTap: () => taskController.displayTimePicker(
+                                context, taskController.timeInput),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 30,
@@ -88,58 +130,6 @@ class AddTask extends StatelessWidget {
                   width: double.infinity,
                   controller: taskController.descriptionController,
                   hintText: 'Description',
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Start Time",
-                          style: TextStyle(
-                            color: white,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        CustomTextField(
-                          width: width / 2 * 0.5,
-                          textAlign: TextAlign.center,
-                          controller: taskController.startTimeInput,
-                          readOnly: true,
-                          onTap: () => taskController.displayTimePicker(
-                              context, taskController.startTimeInput, 1),
-                        )
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "End Time",
-                          style: TextStyle(
-                            color: white,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        CustomTextField(
-                          width: width / 2 * 0.5,
-                          textAlign: TextAlign.center,
-                          controller: taskController.endTimeInput,
-                          readOnly: true,
-                          onTap: () => taskController.displayTimePicker(
-                              context, taskController.endTimeInput, 2),
-                        )
-                      ],
-                    ),
-                  ],
                 ),
                 const SizedBox(
                   height: 30,
@@ -182,8 +172,7 @@ class AddTask extends StatelessWidget {
                           context: context,
                           title: taskController.titleController.text,
                           date: taskController.dateInput.text,
-                          startTime: taskController.startTimeInput.text,
-                          endTime: taskController.endTimeInput.text,
+                          time: taskController.timeInput.text,
                           category: taskController
                               .categories[taskController.chipIndex.value],
                           priority: taskController.selectedPriority.value,
