@@ -88,7 +88,7 @@ class CategoryList extends StatelessWidget {
                     onTap: () => taskController.chipIndex.value = adjustedIndex,
                     onLongPress: () {
                       log(adjustedIndex.toString());
-                      if (index - 1 > 6 && snapshot.data != null) {
+                      if (adjustedIndex > 6) {
                         DocumentSnapshot ds =
                             snapshot.data!.docs[adjustedIndex];
                         taskController.deleteCategory(adjustedIndex, ds.id);
