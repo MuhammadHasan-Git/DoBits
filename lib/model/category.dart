@@ -1,6 +1,7 @@
 class TaskCategory {
+  final String? id;
   final String name;
   final int color;
 
-  TaskCategory({required this.color, required this.name});
+  TaskCategory({this.id, required this.color, required this.name});
 }

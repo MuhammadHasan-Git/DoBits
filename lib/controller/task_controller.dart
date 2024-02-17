@@ -89,12 +89,12 @@ class TaskController extends GetxController {
     if (index > 6) {
       log(id.toString());
       log(index.toString());
-      // await FirebaseFirestore.instance
-      //     .collection("Users")
-      //     .doc(FirebaseAuth.instance.currentUser!.uid)
-      //     .collection("Categories")
-      //     .doc(ds.id)
-      //     .delete();
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("Categories")
+          .doc(id)
+          .delete();
     } else {
       null;
     }

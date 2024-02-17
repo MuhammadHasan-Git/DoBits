@@ -25,16 +25,24 @@ class CategoryList extends StatelessWidget {
             .snapshots(),
         builder: (context, AsyncSnapshot snapshot) {
           final List<dynamic> categories = [...taskController.categories];
-          categories.addAll(snapshot.data.docs.map((doc) {
-            log(doc.id);
-            return TaskCategory(color: doc['color'], name: doc['name']);
-          }));
+          categories.addAll(
+            snapshot.data.docs.map(
+              (DocumentSnapshot doc) {
+                return TaskCategory(
+                  id: doc.id,
+                  color: doc['color'],
+                  name: doc['name'],
+                );
+              },
+            ).toList(),
+          );
 
           return Wrap(
             spacing: 2.0.wp,
             children: List.generate(
               categories.length + 1,
               (index) {
+                
                 if (index == 0) {
                   return InkWell(
                     onTap: () {
@@ -87,11 +95,10 @@ class CategoryList extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => taskController.chipIndex.value = adjustedIndex,
                     onLongPress: () {
-                      log(adjustedIndex.toString());
                       if (adjustedIndex > 6) {
-                        DocumentSnapshot ds =
-                            snapshot.data!.docs[adjustedIndex];
-                        taskController.deleteCategory(adjustedIndex, ds.id);
+                        // log(category.id!);
+                        taskController.deleteCategory(
+                            adjustedIndex, category.id);
                       }
                     },
                     child: Obx(
