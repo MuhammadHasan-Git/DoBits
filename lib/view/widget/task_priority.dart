@@ -53,8 +53,8 @@ class TaskPriority extends StatelessWidget {
                 visualDensity: const VisualDensity(
                     horizontal: VisualDensity.minimumDensity,
                     vertical: VisualDensity.minimumDensity),
-                fillColor: const MaterialStatePropertyAll(Colors.amber),
-                activeColor: Colors.amber,
+                fillColor: const MaterialStatePropertyAll(Colors.orange),
+                activeColor: Colors.orange,
                 onChanged: (value) {
                   taskController.selectedPriority.value = value!;
                 },

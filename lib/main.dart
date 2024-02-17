@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:todo_app/controller/controller.dart';
+import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/firebase_options.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/view/authentication/login_options.dart';

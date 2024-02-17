@@ -44,6 +44,7 @@ dependencies:
   device_info_plus: ^9.1.2
   fluttertoast: ^8.2.4
   flutter_svg: ^2.0.9
+  circle_progress_bar: ^0.1.2
   # device_info_plus: 3.2.4
 
 dev_dependencies:
