@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/get_core.dart';
-import 'package:get/get_instance/get_instance.dart';
+import 'package:get/get.dart';
 import 'package:todo_app/controller/task_controller.dart';
+import 'package:todo_app/model/edit_task_model.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/button.dart';
@@ -11,18 +11,26 @@ import 'package:todo_app/view/widget/task_priority.dart';
 import 'package:todo_app/view/widget/text_field.dart';
 
 class AddTask extends StatelessWidget {
-  const AddTask({super.key});
+  final EditTaskModel? editModel;
+  const AddTask({super.key, this.editModel});
 
   @override
   Widget build(BuildContext context) {
-    final taskController = Get.put(TaskController());
+    final taskController = Get.put(TaskController(editTaskModel: editModel));
 
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: white),
-        title: const Text(
-          "New Task",
-          style: TextStyle(color: white),
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+            taskController.disposePage();
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+        title: Text(
+          editModel != null ? "Edit Task" : "New Task",
+          style: const TextStyle(color: white),
         ),
         centerTitle: true,
       ),
@@ -165,20 +173,20 @@ class AddTask extends StatelessWidget {
                   height: 30,
                 ),
                 CustomButton(
-                    text: "Create Task",
+                    text: editModel == null ? "Create Task" : "Update",
                     onPressed: () async {
                       if (TaskController.formKey.currentState!.validate()) {
-                        await taskController.createTask(
+                        editModel == null ?await taskController.createTask(
                           context: context,
-                          title: taskController.titleController.text,
-                          date: taskController.dateInput.text,
-                          time: taskController.timeInput.text,
+                          title: taskController.titleController.text.trim(),
+                          description:
+                              taskController.descriptionController.text.trim(),
                           category: taskController
-                              .categories[taskController.chipIndex.value],
+                              .defaultCategories[taskController.chipIndex.value],
                           priority: taskController.selectedPriority.value,
                           isRemind: taskController.isRemind.value,
                           subTasks: [],
-                        );
+                        ):taskController.updateTask();
                       }
                     })
               ],

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,22 +7,46 @@ import 'package:intl/intl.dart';
 import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/model/category.dart';
+import 'package:todo_app/model/edit_task_model.dart';
+
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/dialog_content.dart';
 
 class TaskController extends GetxController {
+  final EditTaskModel? editTaskModel;
+  TaskController({this.editTaskModel});
   static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> categoryKey = GlobalKey<FormState>();
-  static String formatTime(TimeOfDay time) {
+  DateTime? selectedDate;
+  DateTime? selectedTime;
+
+  static String formattedDate(
+      {String? dateFormate = 'E, MMM d yyyy', required String dateString}) {
+    DateTime date = DateTime.parse(dateString);
+    String formattedDate = DateFormat(dateFormate).format(date);
+    return formattedDate;
+  }
+
+  static String formatTime(
+      {required DateTime time, String? dateFormate = 'hh:mm a'}) {
     final now = DateTime.now();
     final dateTime =
         DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    return DateFormat.jm().format(dateTime);
+    return DateFormat(dateFormate).format(dateTime);
   }
 
-  RxList<TaskCategory> categories = [
+  void disposePage() {
+    titleController.clear();
+    descriptionController.clear();
+    dateInput.text = DateFormat('E, MMM d yyyy').format(DateTime.now());
+    timeInput.text = DateFormat('hh:mm a').format(DateTime.now());
+    selectedTime = null;
+    selectedDate = null;
+  }
+
+  RxList<TaskCategory> defaultCategories = [
     TaskCategory(
       name: 'Personal',
       color: 0xff42A5F5,
@@ -55,21 +77,16 @@ class TaskController extends GetxController {
     ),
   ].obs;
 
-  String formattedDate = "";
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
   RxString selectedPriority = 'Low Priority'.obs;
   RxBool isRemind = true.obs;
-  
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final dateInput = TextEditingController(
-    text: DateFormat('E, MMM d yyyy').format(DateTime.now()),
-  );
+      text: DateFormat('E, MMM d yyyy').format(DateTime.now()));
 
-  final timeInput = TextEditingController(
-      text: formatTime(const TimeOfDay(hour: 14, minute: 0)));
+  final timeInput =
+      TextEditingController(text: formatTime(time: DateTime.now()));
 
   final categoryName = TextEditingController();
 
@@ -78,18 +95,17 @@ class TaskController extends GetxController {
   Rx<int> selectedColor = 0xff778CDD.obs;
   RxInt buttonIndex = 0.obs;
 
-  void selectCategory(String name, Rx<int> color, context) {
-    categories.add(TaskCategory(color: color.value, name: name));
-    Navigator.of(context).pop();
+  void selectCategory(String name, int color) {
+    defaultCategories.add(TaskCategory(color: color, name: name));
+    Get.back();
     selectedColor.value = 0xff778CDD;
     buttonIndex.value = 0;
     categoryName.clear();
+    selectedDate = null;
   }
 
   deleteCategory(int index, id) async {
     if (index > 6) {
-      log(id.toString());
-      log(index.toString());
       await FirebaseFirestore.instance
           .collection("Users")
           .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -98,6 +114,35 @@ class TaskController extends GetxController {
           .delete();
     } else {
       null;
+    }
+  }
+
+  void deleteTask(String id) async {
+    try {
+      final taskRef = FirebaseFirestore.instance
+          .collection("Users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("Tasks")
+          .doc(id);
+      await taskRef.delete();
+      Get.back();
+      Fluttertoast.showToast(
+          msg: "Task has been deleted",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Failed to delete task",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -173,8 +218,7 @@ class TaskController extends GetxController {
         lastDate: DateTime(2100));
     if (pickedDate != null) {
       selectedDate = pickedDate;
-      formattedDate = DateFormat('E, MMM d yyyy').format(pickedDate);
-      dateInput.text = formattedDate;
+      dateInput.text = formattedDate(dateString: pickedDate.toIso8601String());
     } else {}
   }
 
@@ -182,13 +226,15 @@ class TaskController extends GetxController {
       BuildContext context, TextEditingController timeInput) async {
     TimeOfDay? initialTime;
 
-    initialTime = selectedTime ?? TimeOfDay.now();
+    initialTime = selectedTime != null
+        ? TimeOfDay(hour: selectedTime!.hour, minute: selectedTime!.minute)
+        : TimeOfDay.now();
 
     TimeOfDay? pickedTime =
         await showTimePicker(context: context, initialTime: initialTime);
     if (pickedTime != null) {
-      selectedTime = pickedTime;
-      timeInput.text = formatTime(pickedTime);
+      selectedTime = timeOfDayToDateTime(pickedTime);
+      timeInput.text = formatTime(time: timeOfDayToDateTime(pickedTime));
     }
   }
 
@@ -239,9 +285,7 @@ class TaskController extends GetxController {
   Future<void> createTask({
     required BuildContext context,
     required String title,
-    required String date,
     String? description,
-    required String time,
     required TaskCategory category,
     required String priority,
     required bool isRemind,
@@ -285,9 +329,10 @@ class TaskController extends GetxController {
     final task = Task(
       id: taskRef.id,
       title: title,
-      date: date,
-      description: description,
-      time: time,
+      date: selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+      description: description == '' ? null : description,
+      time: selectedTime?.toIso8601String() ??
+          timeOfDayToDateTime(TimeOfDay.now()).toIso8601String(),
       category: category,
       priority: priority,
       isRemind: isRemind,
@@ -329,5 +374,44 @@ class TaskController extends GetxController {
           fontSize: 16.0);
     }
     navigatorKey.currentState!.popUntil((route) => route.isFirst);
+  }
+
+  DateTime timeOfDayToDateTime(TimeOfDay timeOfDay) {
+    final now = DateTime.now();
+    return DateTime(
+        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
+  }
+
+  @override
+  void onInit() {
+    titleController.text = editTaskModel?.title ?? '';
+    dateInput.text = editTaskModel?.date != null
+        ? formattedDate(dateString: editTaskModel!.date)
+        : DateFormat('E, MMM d yyyy').format(DateTime.now());
+    timeInput.text = formatTime(
+        time: editTaskModel?.time != null
+            ? DateTime.parse(editTaskModel!.time)
+            : DateTime.now());
+    descriptionController.text = editTaskModel?.description ?? '';
+    selectedPriority.value = editTaskModel?.priorities ?? 'Low Priority';
+    isRemind.value = editTaskModel?.isRemind ?? true;
+
+    super.onInit();
+  }
+
+  updateTask() {
+    // FirebaseFirestore firestore = FirebaseFirestore.instance;
+    // FirebaseAuth auth = FirebaseAuth.instance;
+    // final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
+    //     ? firestore
+    //         .collection("Guest")
+    //         .doc(UserController.getId())
+    //         .collection("Tasks")
+    //         .doc()
+    //     : firestore
+    //         .collection("Users")
+    //         .doc(auth.currentUser!.uid)
+    //         .collection("Tasks")
+    //         .doc();
   }
 }

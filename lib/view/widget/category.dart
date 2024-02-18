@@ -22,7 +22,9 @@ class CategoryList extends StatelessWidget {
             .collection("Categories")
             .snapshots(),
         builder: (context, AsyncSnapshot snapshot) {
-          final List<dynamic> categories = [...taskController.categories];
+          final List<dynamic> categories = [
+            ...taskController.defaultCategories
+          ];
           if (snapshot.hasData) {
             categories.addAll(
               snapshot.data.docs.map(
@@ -94,7 +96,6 @@ class CategoryList extends StatelessWidget {
                           taskController.chipIndex.value = adjustedIndex,
                       onLongPress: () {
                         if (adjustedIndex > 6) {
-                          // log(category.id!);
                           taskController.deleteCategory(
                               adjustedIndex, category.id);
                         }

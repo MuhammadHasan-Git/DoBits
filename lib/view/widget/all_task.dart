@@ -27,9 +27,17 @@ class AllTask extends StatelessWidget {
                 .collection("Tasks")
                 .snapshots(),
         builder: (context, AsyncSnapshot snapshot) {
-          return TaskCard(
-            snapshot: snapshot,
-          );
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasData) {
+            return TaskCard(
+              snapshot: snapshot,
+            );
+          } else {
+            return SizedBox();
+          }
         });
   }
 }
