@@ -11,9 +11,10 @@ class Task {
   final TaskCategory category;
   final String priority;
   final bool isRemind;
-  final List<String> subTasks;
+  final List<String>? subTasks;
 
-  Task({required this.createdOn, 
+  Task(
+      {required this.createdOn,
       required this.id,
       required this.title,
       required this.date,

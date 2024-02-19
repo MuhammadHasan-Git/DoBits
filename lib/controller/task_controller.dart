@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/controller/sub_task.dart';
 import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/model/category.dart';
@@ -151,11 +152,12 @@ class TaskController extends GetxController {
         'name': category.name,
         'color': category.color,
       }).then((_) {
+        Get.back();
         categoryName.clear();
         selectedColor.value = 0xff778CDD;
         buttonIndex.value = 0;
       });
-      Get.back();
+
       Fluttertoast.showToast(
           msg: "Category created successfully!",
           toastLength: Toast.LENGTH_SHORT,
@@ -375,6 +377,7 @@ class TaskController extends GetxController {
 
   @override
   void onInit() async {
+    // final subTaskController = Get.find<SubTaskController>();
     mobileId = await UserController.getId();
     titleController.text = editTaskModel?.title ?? '';
     dateInput.text = editTaskModel?.date != null
@@ -391,9 +394,11 @@ class TaskController extends GetxController {
         ? DateTime.parse(editTaskModel!.time)
         : DateTime.now();
     descriptionController.text = editTaskModel?.description ?? '';
+    // editTaskModel!.subtasks ??
+    //     subTaskController.subTasks
+    //         .addAll(editTaskModel!.subtasks! as Iterable<String>);
     selectedPriority.value = editTaskModel?.priorities ?? 'Low Priority';
     isRemind.value = editTaskModel?.isRemind ?? true;
-
     super.onInit();
   }
 

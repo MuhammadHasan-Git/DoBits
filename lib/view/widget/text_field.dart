@@ -12,6 +12,8 @@ class CustomTextField extends StatelessWidget {
     this.readOnly = false,
     this.color = white,
     this.validator,
+    this.onFieldSubmitted,
+    this.autofocus = false,
   });
 
   final String? hintText;
@@ -22,7 +24,11 @@ class CustomTextField extends StatelessWidget {
 
   final bool? readOnly;
 
+  final bool? autofocus;
+
   final Function()? onTap;
+
+  final Function(String)? onFieldSubmitted;
 
   final String? Function(String?)? validator;
 
@@ -46,7 +52,9 @@ class CustomTextField extends StatelessWidget {
         ),
         cursorColor: blue,
         onTap: onTap,
+        onFieldSubmitted: onFieldSubmitted,
         validator: validator,
+        autofocus: autofocus!,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: white.withOpacity(0.5)),

@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/model/category.dart';
+import 'package:todo_app/model/edit_task_model.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/authentication/login_options.dart';
 
 class CategoryList extends StatelessWidget {
-  const CategoryList({super.key});
+  final EditTaskModel? editTaskModel;
+  const CategoryList({super.key, this.editTaskModel});
 
   @override
   Widget build(BuildContext context) {
@@ -88,8 +90,14 @@ class CategoryList extends StatelessWidget {
                       ),
                     );
                   } else {
+                    if (editTaskModel != null) {
+                      taskController.chipIndex.value = targetIndex(
+                          taskController.categories,
+                          editTaskModel!.category.name);
+                    }
                     final adjustedIndex = index - 1;
-                    final category = taskController.categories[adjustedIndex];
+                    TaskCategory category =
+                        taskController.categories[adjustedIndex];
 
                     return GestureDetector(
                       onTap: () =>
@@ -134,5 +142,14 @@ class CategoryList extends StatelessWidget {
             return const SizedBox();
           }
         });
+  }
+
+  int targetIndex(List<dynamic> categories, String target) {
+    for (var i = 0; i < categories.length; i++) {
+      if (categories[i].name == target) {
+        return i;
+      }
+    }
+    return 0;
   }
 }

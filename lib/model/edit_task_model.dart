@@ -8,6 +8,7 @@ class EditTaskModel {
   final String time;
   final TaskCategory category;
   final String priorities;
+  final List<String>? subtasks;
   final bool isRemind;
   EditTaskModel(
       {required this.id,
@@ -17,5 +18,6 @@ class EditTaskModel {
       required this.time,
       required this.category,
       required this.priorities,
+      this.subtasks,
       required this.isRemind});
 }
