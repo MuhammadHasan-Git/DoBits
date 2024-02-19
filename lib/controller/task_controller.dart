@@ -8,8 +8,8 @@ import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/edit_task_model.dart';
-
 import 'package:todo_app/model/task.dart';
+import 'package:todo_app/model/update_task.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/dialog_content.dart';
@@ -19,6 +19,7 @@ class TaskController extends GetxController {
   TaskController({this.editTaskModel});
   static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> categoryKey = GlobalKey<FormState>();
+  late final String? mobileId;
   DateTime? selectedDate;
   DateTime? selectedTime;
 
@@ -37,16 +38,7 @@ class TaskController extends GetxController {
     return DateFormat(dateFormate).format(dateTime);
   }
 
-  void disposePage() {
-    titleController.clear();
-    descriptionController.clear();
-    dateInput.text = DateFormat('E, MMM d yyyy').format(DateTime.now());
-    timeInput.text = DateFormat('hh:mm a').format(DateTime.now());
-    selectedTime = null;
-    selectedDate = null;
-  }
-
-  RxList<TaskCategory> defaultCategories = [
+  List<TaskCategory> defaultCategories = [
     TaskCategory(
       name: 'Personal',
       color: 0xff42A5F5,
@@ -82,13 +74,13 @@ class TaskController extends GetxController {
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
-  final dateInput = TextEditingController(
-      text: DateFormat('E, MMM d yyyy').format(DateTime.now()));
+  final dateInput = TextEditingController();
 
-  final timeInput =
-      TextEditingController(text: formatTime(time: DateTime.now()));
+  final timeInput = TextEditingController();
 
   final categoryName = TextEditingController();
+
+  RxList categories = [].obs;
 
   final chipIndex = 0.obs;
 
@@ -193,7 +185,7 @@ class TaskController extends GetxController {
   }
 
   Future displayDatePicker(BuildContext context) async {
-    final initialDate = selectedDate ?? DateTime.now();
+    final initialDate = selectedDate;
     DateTime? pickedDate = await showDatePicker(
         builder: (context, child) {
           return Theme(
@@ -226,9 +218,8 @@ class TaskController extends GetxController {
       BuildContext context, TextEditingController timeInput) async {
     TimeOfDay? initialTime;
 
-    initialTime = selectedTime != null
-        ? TimeOfDay(hour: selectedTime!.hour, minute: selectedTime!.minute)
-        : TimeOfDay.now();
+    initialTime =
+        TimeOfDay(hour: selectedTime!.hour, minute: selectedTime!.minute);
 
     TimeOfDay? pickedTime =
         await showTimePicker(context: context, initialTime: initialTime);
@@ -383,15 +374,22 @@ class TaskController extends GetxController {
   }
 
   @override
-  void onInit() {
+  void onInit() async {
+    mobileId = await UserController.getId();
     titleController.text = editTaskModel?.title ?? '';
     dateInput.text = editTaskModel?.date != null
         ? formattedDate(dateString: editTaskModel!.date)
         : DateFormat('E, MMM d yyyy').format(DateTime.now());
+    selectedDate = editTaskModel?.date != null
+        ? DateTime.parse(editTaskModel!.date)
+        : DateTime.now();
     timeInput.text = formatTime(
         time: editTaskModel?.time != null
             ? DateTime.parse(editTaskModel!.time)
             : DateTime.now());
+    selectedTime = editTaskModel?.time != null
+        ? DateTime.parse(editTaskModel!.time)
+        : DateTime.now();
     descriptionController.text = editTaskModel?.description ?? '';
     selectedPriority.value = editTaskModel?.priorities ?? 'Low Priority';
     isRemind.value = editTaskModel?.isRemind ?? true;
@@ -399,19 +397,73 @@ class TaskController extends GetxController {
     super.onInit();
   }
 
-  updateTask() {
-    // FirebaseFirestore firestore = FirebaseFirestore.instance;
-    // FirebaseAuth auth = FirebaseAuth.instance;
-    // final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
-    //     ? firestore
-    //         .collection("Guest")
-    //         .doc(UserController.getId())
-    //         .collection("Tasks")
-    //         .doc()
-    //     : firestore
-    //         .collection("Users")
-    //         .doc(auth.currentUser!.uid)
-    //         .collection("Tasks")
-    //         .doc();
+  updateTask(UpdateTaskModel updateTaskModel, context) async {
+    try {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => Material(
+                color: Colors.transparent,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(
+                      color: darkBlue,
+                    ),
+                    SizedBox(
+                      height: 3.0.wp,
+                    ),
+                    const Text(
+                      "Updating...",
+                      style: TextStyle(color: blue),
+                    )
+                  ],
+                ),
+              ));
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      FirebaseAuth auth = FirebaseAuth.instance;
+      final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
+          ? firestore
+              .collection("Guest")
+              .doc(mobileId)
+              .collection("Tasks")
+              .doc(updateTaskModel.id)
+          : firestore
+              .collection("Users")
+              .doc(auth.currentUser!.uid)
+              .collection("Tasks")
+              .doc(updateTaskModel.id);
+      await taskRef.update({
+        'title': updateTaskModel.title,
+        'date': updateTaskModel.date,
+        'description': updateTaskModel.description,
+        'time': updateTaskModel.time,
+        'categoryName': updateTaskModel.category.name,
+        'categoryColor': updateTaskModel.category.color.toString(),
+        'priority': updateTaskModel.priority,
+        'isRemind': updateTaskModel.isRemind,
+        'subTasks': updateTaskModel.subTasks,
+      });
+      Fluttertoast.showToast(
+          msg: "Task updated successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } catch (e) {
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
+      Fluttertoast.showToast(
+          msg: "Failed to update task",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+    navigatorKey.currentState!.popUntil((route) => route.isFirst);
   }
 }

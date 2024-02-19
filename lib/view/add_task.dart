@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/model/edit_task_model.dart';
+import 'package:todo_app/model/update_task.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/button.dart';
@@ -24,7 +25,6 @@ class AddTask extends StatelessWidget {
         leading: IconButton(
           onPressed: () {
             Get.back();
-            taskController.disposePage();
           },
           icon: const Icon(Icons.arrow_back),
         ),
@@ -176,17 +176,39 @@ class AddTask extends StatelessWidget {
                     text: editModel == null ? "Create Task" : "Update",
                     onPressed: () async {
                       if (TaskController.formKey.currentState!.validate()) {
-                        editModel == null ?await taskController.createTask(
-                          context: context,
-                          title: taskController.titleController.text.trim(),
-                          description:
-                              taskController.descriptionController.text.trim(),
-                          category: taskController
-                              .defaultCategories[taskController.chipIndex.value],
-                          priority: taskController.selectedPriority.value,
-                          isRemind: taskController.isRemind.value,
-                          subTasks: [],
-                        ):taskController.updateTask();
+                        if (editModel == null) {
+                          await taskController.createTask(
+                            context: context,
+                            title: taskController.titleController.text.trim(),
+                            description: taskController
+                                .descriptionController.text
+                                .trim(),
+                            category: taskController
+                                .categories[taskController.chipIndex.value],
+                            priority: taskController.selectedPriority.value,
+                            isRemind: taskController.isRemind.value,
+                            subTasks: [],
+                          );
+                        } else {
+                          final UpdateTaskModel updateTaskModel = UpdateTaskModel(
+                              id: editModel!.id,
+                              title: taskController.titleController.text,
+                              description: taskController
+                                          .descriptionController.text ==
+                                      ''
+                                  ? null
+                                  : taskController.descriptionController.text,
+                              date: taskController.selectedDate!
+                                  .toIso8601String(),
+                              time: taskController.selectedTime!
+                                  .toIso8601String(),
+                              category: taskController
+                                  .categories[taskController.chipIndex.value],
+                              priority: taskController.selectedPriority.value,
+                              isRemind: taskController.isRemind.value,
+                              subTasks: []);
+                          taskController.updateTask(updateTaskModel, context);
+                        }
                       }
                     })
               ],
