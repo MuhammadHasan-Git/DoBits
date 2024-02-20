@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/edit_task_model.dart';
+import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/add_task.dart';
@@ -41,7 +42,8 @@ class PopupButton extends StatelessWidget {
                         color: int.parse(ds['categoryColor']),
                         name: ds['categoryName']),
                     priorities: ds['priority'],
-                    // subtasks: List<String>.from(ds['subTasks']),
+                    subtasks: List<SubTasksModel>.from((ds['subTasks'] as List)
+                        .map((e) => SubTasksModel.fromJson(e))),
                     isRemind: ds['isRemind']),
               ),
             );

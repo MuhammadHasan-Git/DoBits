@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_app/model/category.dart';
+import 'package:todo_app/model/sub_tasks.dart';
 
 class Task {
   final String id;
@@ -11,7 +12,7 @@ class Task {
   final TaskCategory category;
   final String priority;
   final bool isRemind;
-  final List<String>? subTasks;
+  final List<SubTasksModel>? subTasks;
 
   Task(
       {required this.createdOn,
@@ -23,5 +24,5 @@ class Task {
       required this.category,
       required this.priority,
       required this.isRemind,
-      required this.subTasks});
+      this.subTasks});
 }

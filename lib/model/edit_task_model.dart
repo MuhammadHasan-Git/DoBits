@@ -1,4 +1,5 @@
 import 'package:todo_app/model/category.dart';
+import 'package:todo_app/model/sub_tasks.dart';
 
 class EditTaskModel {
   final String id;
@@ -8,7 +9,7 @@ class EditTaskModel {
   final String time;
   final TaskCategory category;
   final String priorities;
-  final List<String>? subtasks;
+  final List<SubTasksModel>? subtasks;
   final bool isRemind;
   EditTaskModel(
       {required this.id,

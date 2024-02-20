@@ -9,6 +9,7 @@ import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/edit_task_model.dart';
+import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/model/update_task.dart';
 import 'package:todo_app/utils/colors.dart';
@@ -282,7 +283,7 @@ class TaskController extends GetxController {
     required TaskCategory category,
     required String priority,
     required bool isRemind,
-    required List<String> subTasks,
+    required List<SubTasksModel>? subTasks,
   }) async {
     showDialog(
         context: context,
@@ -329,7 +330,7 @@ class TaskController extends GetxController {
       category: category,
       priority: priority,
       isRemind: isRemind,
-      subTasks: subTasks,
+      subTasks: subTasks?.toList(),
       createdOn: FieldValue.serverTimestamp(),
     );
 
@@ -345,7 +346,7 @@ class TaskController extends GetxController {
         'categoryColor': task.category.color.toString(),
         'priority': task.priority,
         'isRemind': task.isRemind,
-        'subTasks': task.subTasks,
+        'subTasks': subTasks?.map((e) => e.toJson()),
       });
       await Fluttertoast.showToast(
           msg: "Task created successfully!",
@@ -377,7 +378,7 @@ class TaskController extends GetxController {
 
   @override
   void onInit() async {
-    // final subTaskController = Get.find<SubTaskController>();
+    final subTaskController = Get.put(SubTaskController());
     mobileId = await UserController.getId();
     titleController.text = editTaskModel?.title ?? '';
     dateInput.text = editTaskModel?.date != null
@@ -394,9 +395,22 @@ class TaskController extends GetxController {
         ? DateTime.parse(editTaskModel!.time)
         : DateTime.now();
     descriptionController.text = editTaskModel?.description ?? '';
-    // editTaskModel!.subtasks ??
-    //     subTaskController.subTasks
-    //         .addAll(editTaskModel!.subtasks! as Iterable<String>);
+    if (editTaskModel!.subtasks != null) {
+      for (var i = 0; i < editTaskModel!.subtasks!.length; i++) {
+        subTaskController.getSubtask(
+            SubTasksModel(
+                subtask: editTaskModel!.subtasks![i].subtask,
+                done: editTaskModel!.subtasks![i].done),
+            i);
+        // subTaskController.addSubtask(
+        //     SubTasksModel(
+        //         subtask: editTaskModel!.subtasks![i].subtask,
+        //         done: editTaskModel!.subtasks![i].done),
+        //     i,
+        //     true);
+      }
+    }
+
     selectedPriority.value = editTaskModel?.priorities ?? 'Low Priority';
     isRemind.value = editTaskModel?.isRemind ?? true;
     super.onInit();
@@ -439,6 +453,7 @@ class TaskController extends GetxController {
               .doc(auth.currentUser!.uid)
               .collection("Tasks")
               .doc(updateTaskModel.id);
+
       await taskRef.update({
         'title': updateTaskModel.title,
         'date': updateTaskModel.date,
@@ -448,7 +463,8 @@ class TaskController extends GetxController {
         'categoryColor': updateTaskModel.category.color.toString(),
         'priority': updateTaskModel.priority,
         'isRemind': updateTaskModel.isRemind,
-        'subTasks': updateTaskModel.subTasks,
+        // 'subTasks': updateTaskModel.subTasks,
+        'subTasks': updateTaskModel.subTasks!.map((e) => e.toJson()),
       });
       Fluttertoast.showToast(
           msg: "Task updated successfully!",

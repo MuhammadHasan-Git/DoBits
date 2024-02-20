@@ -1,4 +1,3 @@
-import 'package:circle_progress_bar/circle_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
@@ -137,18 +136,13 @@ class TaskReport extends StatelessWidget {
                     child: SizedBox(
                       width: 80,
                       height: 80,
-                      child: CircleProgressBar(
-                        foregroundColor: const Color(0xFF7fff00),
-                        value: 0.68,
-                        backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.2),
-                        child: const Center(
-                            child: AnimatedCount(
-                                style: TextStyle(color: white),
-                                count: 0.68,
-                                unit: "%",
-                                duration: Duration(milliseconds: 500))),
-                      ),
+                      // child: CircularPercentIndicator(
+                      //   radius: 60.0,
+                      //   lineWidth: 5.0,
+                      //   percent: 1.0,
+                      //   center: new Text("100%"),
+                      //   progressColor: Colors.green,
+                      // )
                     ),
                   ),
                 ),

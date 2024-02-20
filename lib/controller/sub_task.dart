@@ -1,36 +1,50 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 
 class SubTaskController extends GetxController {
   final listKey = GlobalKey<AnimatedListState>();
   final textControlelr = TextEditingController();
-  final RxList<String> subTasks = <String>[].obs;
+  final RxList<SubTasksModel> subTaskList = <SubTasksModel>[].obs;
+  getSubtask(SubTasksModel subTasksModel, index) {
+    subTaskList.insert(index, subTasksModel);
+    listKey.currentState?.insertItem(index);
+  }
 
-  void addSubtask(String subtask, int index) {
+  void addSubtask(SubTasksModel subtask, int index) {
     FocusManager.instance.primaryFocus?.requestFocus();
-    if (textControlelr.text.isNotEmpty || textControlelr.text != '') {
-      log(textControlelr.text.isEmpty.toString());
-
-      subTasks.insert(index, subtask);
+    if (subTaskList.isNotEmpty &&
+        subTaskList.firstWhereOrNull((element) =>
+                element.subtask.trim() == subtask.subtask.trim()) !=
+            null) {
+      Fluttertoast.showToast(
+          msg: "Todo item already exist",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else if (subtask.subtask.trim().isNotEmpty) {
+      subTaskList.insert(index, subtask);
       listKey.currentState?.insertItem(index);
       textControlelr.clear();
     }
   }
 
   void deleteSubtask(int index) {
-    final removedItem = subTasks[index];
-    subTasks.removeAt(index);
+    final removedItem = subTaskList[index];
+    subTaskList.removeAt(index);
     listKey.currentState!.removeItem(
       index,
       (context, animation) => buildItem(removedItem, animation),
     );
   }
 
-  Widget buildItem(String item, Animation<double> animation) {
+  Widget buildItem(SubTasksModel? item, Animation<double> animation) {
     return ScaleTransition(
       scale: animation,
       child: Padding(
@@ -46,7 +60,7 @@ class SubTaskController extends GetxController {
               children: [
                 Expanded(
                   child: Text(
-                    item,
+                    item!.subtask,
                     softWrap: false,
                     maxLines: 1,
                     overflow: TextOverflow.fade,
@@ -61,7 +75,12 @@ class SubTaskController extends GetxController {
                   constraints: const BoxConstraints(),
                   style: const ButtonStyle(
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  onPressed: () => deleteSubtask(subTasks.indexOf(item)),
+                  onPressed: () {
+                    final SubTasksModel subTasksModel =
+                        SubTasksModel(subtask: item.subtask, done: item.done);
+                    deleteSubtask(subTaskList.indexWhere(
+                        (task) => task.subtask == subTasksModel.subtask));
+                  },
                   icon: const Icon(
                     Icons.delete,
                     color: Colors.red,

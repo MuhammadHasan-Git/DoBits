@@ -1,9 +1,9 @@
-import 'package:circle_progress_bar/circle_progress_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/utils/colors.dart';
@@ -177,26 +177,19 @@ class TaskCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        width: 16.0.wp,
-                        height: 16.0.wp,
-                        child: CircleProgressBar(
-                          strokeWidth: 4,
-                          foregroundColor: Color(
-                            int.parse(
-                              ds['categoryColor'],
-                            ),
-                          ),
-                          value: 0.2,
-                          backgroundColor: Color(int.parse(ds['categoryColor']))
-                              .withOpacity(0.1),
-                          child: const Center(
-                              child: AnimatedCount(
-                                  style: TextStyle(color: white),
-                                  count: 1,
-                                  unit: "%",
-                                  duration: Duration(milliseconds: 500))),
+                      CircularPercentIndicator(
+                        radius: 10.0.wp,
+                        animation: true,
+                        lineWidth: 3.0,
+                        percent: 0.5,
+                        backgroundColor: Color(int.parse(ds['categoryColor']))
+                            .withOpacity(0.1),
+                        center: Text(
+                          "100%",
+                          style: TextStyle(
+                              color: Color(int.parse(ds['categoryColor']))),
                         ),
+                        progressColor: Color(int.parse(ds['categoryColor'])),
                       ),
                     ],
                   )

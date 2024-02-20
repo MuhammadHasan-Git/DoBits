@@ -158,7 +158,9 @@ class AddTask extends StatelessWidget {
                   const SizedBox(
                     height: 5,
                   ),
-                  SubTask(),
+                  SubTask(
+                    editTaskModel: editModel,
+                  ),
                   const SizedBox(
                     height: 30,
                   ),
@@ -211,7 +213,7 @@ class AddTask extends StatelessWidget {
                                   .categories[taskController.chipIndex.value],
                               priority: taskController.selectedPriority.value,
                               isRemind: taskController.isRemind.value,
-                              subTasks: subTaskController.subTasks,
+                              subTasks: subTaskController.subTaskList,
                             );
                           } else {
                             final UpdateTaskModel updateTaskModel =
@@ -231,7 +233,9 @@ class AddTask extends StatelessWidget {
                                   .categories[taskController.chipIndex.value],
                               priority: taskController.selectedPriority.value,
                               isRemind: taskController.isRemind.value,
-                              subTasks: subTaskController.subTasks,
+                              subTasks: subTaskController.subTaskList.isEmpty
+                                  ? []
+                                  : subTaskController.subTaskList,
                             );
                             taskController.updateTask(updateTaskModel, context);
                           }
