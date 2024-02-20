@@ -36,7 +36,7 @@ class AllTask extends StatelessWidget {
               snapshot: snapshot,
             );
           } else {
-            return SizedBox();
+            return const SizedBox();
           }
         });
   }
