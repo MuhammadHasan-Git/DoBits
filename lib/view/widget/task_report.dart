@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 
@@ -133,16 +134,15 @@ class TaskReport extends StatelessWidget {
                 Flexible(
                   child: Align(
                     alignment: Alignment.center,
-                    child: SizedBox(
-                      width: 80,
-                      height: 80,
-                      // child: CircularPercentIndicator(
-                      //   radius: 60.0,
-                      //   lineWidth: 5.0,
-                      //   percent: 1.0,
-                      //   center: new Text("100%"),
-                      //   progressColor: Colors.green,
-                      // )
+                    child: CircularPercentIndicator(
+                      radius: 12.0.wp,
+                      lineWidth: 5.0,
+                      percent: 1.0,
+                      center: const Text(
+                        "100%",
+                        style: TextStyle(color: white),
+                      ),
+                      progressColor: const Color(0xFF7fff00),
                     ),
                   ),
                 ),
