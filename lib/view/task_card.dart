@@ -198,7 +198,7 @@ class TaskCard extends StatelessWidget {
                                 radius: 10.0.wp,
                                 animateFromLastPercent: true,
                                 animation: true,
-                                lineWidth: 3.0,
+                                lineWidth: 5.0,
                                 percent: (todos
                                         .where((element) => element.done)
                                         .length /
