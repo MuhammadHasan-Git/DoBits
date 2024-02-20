@@ -26,7 +26,8 @@ class HomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: blue,
         tooltip: 'Add Task',
-        onPressed: () => Get.to(() => const AddTask()),
+        onPressed: () =>
+            Get.to(() => const AddTask(), transition: Transition.rightToLeft),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );

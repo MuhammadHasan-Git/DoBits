@@ -46,6 +46,8 @@ dependencies:
   flutter_svg: ^2.0.9
   flutter_slidable: ^3.0.1
   percent_indicator: ^4.2.3
+  step_progress_indicator: ^1.0.2
+  animate_do: ^3.3.3
   # device_info_plus: 3.2.4
 
 dev_dependencies:

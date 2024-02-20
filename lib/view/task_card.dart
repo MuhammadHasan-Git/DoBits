@@ -6,8 +6,11 @@ import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/task_controller.dart';
+import 'package:todo_app/model/category.dart';
+import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
+import 'package:todo_app/view/todo_list.dart';
 import 'package:todo_app/view/widget/popup_button.dart';
 
 class TaskCard extends StatelessWidget {
@@ -22,6 +25,8 @@ class TaskCard extends StatelessWidget {
       itemCount: snapshot?.data != null ? snapshot?.data!.docs.length : 0,
       itemBuilder: (context, index) {
         DocumentSnapshot ds = snapshot?.data!.docs[index];
+        final RxList<SubTasksModel> todos = List<SubTasksModel>.from(
+            (ds['subTasks'] as List).map((e) => SubTasksModel.fromJson(e))).obs;
 
         String formattedDate = TaskController.formattedDate(
           dateString: ds['date'],
@@ -177,20 +182,44 @@ class TaskCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      CircularPercentIndicator(
-                        radius: 10.0.wp,
-                        animation: true,
-                        lineWidth: 3.0,
-                        percent: 0.5,
-                        backgroundColor: Color(int.parse(ds['categoryColor']))
-                            .withOpacity(0.1),
-                        center: Text(
-                          "100%",
-                          style: TextStyle(
-                              color: Color(int.parse(ds['categoryColor']))),
-                        ),
-                        progressColor: Color(int.parse(ds['categoryColor'])),
-                      ),
+                      todos.isNotEmpty
+                          ? GestureDetector(
+                              onTap: () => Get.to(
+                                  () => TodoListPage(
+                                        id: ds.id,
+                                        title: ds['title'],
+                                        category: TaskCategory(
+                                          color: int.parse(ds['categoryColor']),
+                                          name: ds['categoryName'],
+                                        ),
+                                      ),
+                                  transition: Transition.downToUp),
+                              child: CircularPercentIndicator(
+                                radius: 10.0.wp,
+                                animateFromLastPercent: true,
+                                animation: true,
+                                lineWidth: 3.0,
+                                percent: (todos
+                                        .where((element) => element.done)
+                                        .length /
+                                    todos.length),
+                                circularStrokeCap: CircularStrokeCap.round,
+                                backgroundColor:
+                                    Color(int.parse(ds['categoryColor']))
+                                        .withOpacity(0.1),
+                                center: Text(
+                                  '${(todos.where((element) => element.done).length / todos.length * 100).toInt().toString()}%',
+                                  style: TextStyle(
+                                    color: Color(
+                                      int.parse(ds['categoryColor']),
+                                    ),
+                                  ),
+                                ),
+                                progressColor:
+                                    Color(int.parse(ds['categoryColor'])),
+                              ),
+                            )
+                          : const SizedBox()
                     ],
                   )
                 ],

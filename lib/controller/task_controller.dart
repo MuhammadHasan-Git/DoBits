@@ -402,15 +402,8 @@ class TaskController extends GetxController {
                 subtask: editTaskModel!.subtasks![i].subtask,
                 done: editTaskModel!.subtasks![i].done),
             i);
-        // subTaskController.addSubtask(
-        //     SubTasksModel(
-        //         subtask: editTaskModel!.subtasks![i].subtask,
-        //         done: editTaskModel!.subtasks![i].done),
-        //     i,
-        //     true);
       }
     }
-
     selectedPriority.value = editTaskModel?.priorities ?? 'Low Priority';
     isRemind.value = editTaskModel?.isRemind ?? true;
     super.onInit();
@@ -463,7 +456,6 @@ class TaskController extends GetxController {
         'categoryColor': updateTaskModel.category.color.toString(),
         'priority': updateTaskModel.priority,
         'isRemind': updateTaskModel.isRemind,
-        // 'subTasks': updateTaskModel.subTasks,
         'subTasks': updateTaskModel.subTasks!.map((e) => e.toJson()),
       });
       Fluttertoast.showToast(
