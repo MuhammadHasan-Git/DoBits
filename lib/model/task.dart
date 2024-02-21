@@ -13,16 +13,19 @@ class Task {
   final String priority;
   final bool isRemind;
   final List<SubTasksModel>? subTasks;
+  final bool isCompleted;
 
-  Task(
-      {required this.createdOn,
-      required this.id,
-      required this.title,
-      required this.date,
-      required this.description,
-      required this.time,
-      required this.category,
-      required this.priority,
-      required this.isRemind,
-      this.subTasks});
+  Task({
+    required this.createdOn,
+    required this.id,
+    required this.title,
+    required this.date,
+    required this.description,
+    required this.time,
+    required this.category,
+    required this.priority,
+    required this.isRemind,
+    required this.isCompleted,
+    this.subTasks,
+  });
 }

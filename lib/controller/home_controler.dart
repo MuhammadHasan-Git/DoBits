@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:todo_app/controller/task_controller.dart';
@@ -7,7 +9,6 @@ import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/utils/colors.dart';
 
 class HomeController extends GetxController {
-  final PageController pageController = PageController(viewportFraction: 0.9);
   RxInt index = 0.obs;
   late final String? mobileId;
 
@@ -65,6 +66,100 @@ class HomeController extends GetxController {
         ],
       ),
     );
+  }
+
+  completeTask(String docId) async {
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      FirebaseAuth auth = FirebaseAuth.instance;
+      final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
+          ? firestore
+              .collection("Guest")
+              .doc(mobileId)
+              .collection("Tasks")
+              .doc(docId)
+          : firestore
+              .collection("Users")
+              .doc(auth.currentUser!.uid)
+              .collection("Tasks")
+              .doc(docId);
+
+      DocumentSnapshot documentSnapshot = await taskRef.get();
+      List<Map<String, dynamic>> existingList =
+          List.from(documentSnapshot.get('subTasks'));
+      for (var element in existingList) {
+        element['done'] = true;
+      }
+
+      await taskRef.update({'isCompleted': true, 'subTasks': existingList});
+
+      Fluttertoast.showToast(
+          msg: "Task Completed",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } on FirebaseAuthException {
+      Fluttertoast.showToast(
+          msg: "Failed to complete task",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  undoCompletedTask(String docId) async {
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      FirebaseAuth auth = FirebaseAuth.instance;
+      final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
+          ? firestore
+              .collection("Guest")
+              .doc(mobileId)
+              .collection("Tasks")
+              .doc(docId)
+          : firestore
+              .collection("Users")
+              .doc(auth.currentUser!.uid)
+              .collection("Tasks")
+              .doc(docId);
+
+      DocumentSnapshot documentSnapshot = await taskRef.get();
+      List<Map<String, dynamic>> existingList =
+          List.from(documentSnapshot.get('subTasks'));
+      for (var element in existingList) {
+        element['done'] = false;
+      }
+
+      await taskRef.update({
+        'isCompleted': false,
+        'subTasks': existingList,
+        'createdOn': FieldValue.serverTimestamp(),
+      });
+
+      Fluttertoast.showToast(
+          msg: "Task Recreated Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } on FirebaseAuthException {
+      Fluttertoast.showToast(
+          msg: "Failed to recreate task",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 
   Color? getPriorityColor(value) {

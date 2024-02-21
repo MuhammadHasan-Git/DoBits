@@ -321,18 +321,19 @@ class TaskController extends GetxController {
             .collection("Tasks")
             .doc();
     final task = Task(
-      id: taskRef.id,
-      title: title,
-      date: selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-      description: description == '' ? null : description,
-      time: selectedTime?.toIso8601String() ??
-          timeOfDayToDateTime(TimeOfDay.now()).toIso8601String(),
-      category: category,
-      priority: priority,
-      isRemind: isRemind,
-      subTasks: subTasks?.toList(),
-      createdOn: FieldValue.serverTimestamp(),
-    );
+        id: taskRef.id,
+        title: title,
+        date:
+            selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+        description: description == '' ? null : description,
+        time: selectedTime?.toIso8601String() ??
+            timeOfDayToDateTime(TimeOfDay.now()).toIso8601String(),
+        category: category,
+        priority: priority,
+        isRemind: isRemind,
+        subTasks: subTasks?.toList(),
+        createdOn: FieldValue.serverTimestamp(),
+        isCompleted: false);
 
     try {
       await taskRef.set({
@@ -347,6 +348,7 @@ class TaskController extends GetxController {
         'priority': task.priority,
         'isRemind': task.isRemind,
         'subTasks': subTasks?.map((e) => e.toJson()),
+        'isCompleted': false,
       });
       await Fluttertoast.showToast(
           msg: "Task created successfully!",
@@ -448,6 +450,7 @@ class TaskController extends GetxController {
               .doc(updateTaskModel.id);
 
       await taskRef.update({
+        'updatedOn': FieldValue.serverTimestamp(),
         'title': updateTaskModel.title,
         'date': updateTaskModel.date,
         'description': updateTaskModel.description,

@@ -163,62 +163,77 @@ class TodoListPage extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 20),
                           child: SlideInRight(
                             duration: Duration(milliseconds: 350 * index),
-                            child: Card(
-                              elevation: 10,
-                              color: white.withOpacity(0.1),
-                              surfaceTintColor: white.withOpacity(0.1),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 15),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: Obx(
-                                        () => Transform.scale(
-                                          scale: 1.2,
-                                          child: Checkbox(
-                                            checkColor: Colors.green,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
+                            child: Obx(
+                              () => AnimatedOpacity(
+                                opacity: isChecked.value ? 0.3 : 1,
+                                duration: const Duration(milliseconds: 600),
+                                child: Card(
+                                  elevation: 10,
+                                  color: white.withOpacity(0.1),
+                                  surfaceTintColor: white.withOpacity(0.1),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 15),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: Transform.scale(
+                                            scale: 1.2,
+                                            child: Checkbox(
+                                              checkColor: Colors.green,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                              ),
+                                              fillColor:
+                                                  const MaterialStatePropertyAll(
+                                                      black),
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                              value: isChecked.value,
+                                              onChanged: (value) {
+                                                todoCtrl.doneTodo(
+                                                    id,
+                                                    homeCtrl.mobileId,
+                                                    value,
+                                                    index,
+                                                    todos[index].subtask);
+                                              },
                                             ),
-                                            fillColor:
-                                                const MaterialStatePropertyAll(
-                                                    black),
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                            value: isChecked.value,
-                                            onChanged: (value) {
-                                              todoCtrl.doneTodo(
-                                                  id,
-                                                  homeCtrl.mobileId,
-                                                  value,
-                                                  index,
-                                                  todos[index].subtask);
-                                            },
                                           ),
                                         ),
-                                      ),
+                                        SizedBox(
+                                          width: 5.0.wp,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            todos[index].subtask,
+                                            softWrap: false,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.fade,
+                                            style: TextStyle(
+                                              decoration: isChecked.value
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none,
+                                              decorationColor: white,
+                                              decorationThickness: 1.5,
+                                              decorationStyle:
+                                                  TextDecorationStyle.solid,
+                                              textBaseline:
+                                                  TextBaseline.alphabetic,
+                                              color: white,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(
-                                      width: 5.0.wp,
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        todos[index].subtask,
-                                        softWrap: false,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.fade,
-                                        style: const TextStyle(
-                                            color: white, fontSize: 18),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
