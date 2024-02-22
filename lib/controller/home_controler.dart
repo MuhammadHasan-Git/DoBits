@@ -67,7 +67,7 @@ class HomeController extends GetxController {
     );
   }
 
-  completeTask(String docId) async {
+  completeTask(String docId, String mobileId) async {
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;
@@ -112,7 +112,7 @@ class HomeController extends GetxController {
     }
   }
 
-  undoCompletedTask(String docId) async {
+  undoCompletedTask(String docId, String mobileId) async {
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;

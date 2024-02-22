@@ -14,9 +14,9 @@ import 'package:todo_app/view/todo_list.dart';
 import 'package:todo_app/view/widget/popup_button.dart';
 
 class TaskCard extends StatelessWidget {
-  const TaskCard({super.key, required this.snapshot});
+  const TaskCard({super.key, required this.snapshot, required this.mobileId});
   final AsyncSnapshot? snapshot;
-
+  final String mobileId;
   @override
   Widget build(BuildContext context) {
     final homeController = Get.put(HomeController());
@@ -45,8 +45,8 @@ class TaskCard extends StatelessWidget {
                   ),
                   SlidableAction(
                     onPressed: (context) => isCompleted
-                        ? homeController.undoCompletedTask(ds.id)
-                        : homeController.completeTask(ds.id),
+                        ? homeController.undoCompletedTask(ds.id, mobileId)
+                        : homeController.completeTask(ds.id, mobileId),
                     backgroundColor: isCompleted ? Colors.red : Colors.green,
                     icon: isCompleted ? Icons.undo : Icons.done,
                     label: isCompleted ? "Undo" : "Finish",
@@ -197,6 +197,7 @@ class TaskCard extends StatelessWidget {
                                       () => TodoListPage(
                                             id: ds.id,
                                             title: ds['title'],
+                                            mobileId: mobileId,
                                             category: TaskCategory(
                                               color: int.parse(
                                                   ds['categoryColor']),

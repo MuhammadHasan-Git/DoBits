@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -326,7 +325,6 @@ class TaskController extends GetxController {
             .collection("Tasks")
             .doc();
     final task = Task(
-<<<<<<< HEAD
       id: taskRef.id,
       title: title,
       date: selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
@@ -338,6 +336,7 @@ class TaskController extends GetxController {
       isRemind: isRemind,
       subTasks: subTasks?.toList(),
       createdOn: FieldValue.serverTimestamp(),
+      isCompleted: false,
     );
     log('selectedTime: $selectedTime');
     if (isRemind) {
@@ -352,22 +351,6 @@ class TaskController extends GetxController {
     //   id: math.Random().nextInt(100),
     //   title: title,
     // );
-=======
-        id: taskRef.id,
-        title: title,
-        date:
-            selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-        description: description == '' ? null : description,
-        time: selectedTime?.toIso8601String() ??
-            timeOfDayToDateTime(TimeOfDay.now()).toIso8601String(),
-        category: category,
-        priority: priority,
-        isRemind: isRemind,
-        subTasks: subTasks?.toList(),
-        createdOn: FieldValue.serverTimestamp(),
-        isCompleted: false);
-
->>>>>>> b9d8a419ca5be6f697fa33efd7a28234b6a5bcad
     try {
       await taskRef.set({
         'id': taskRef.id,

@@ -19,33 +19,24 @@ class AllTask extends StatelessWidget {
     UserController userController = Get.put(UserController());
     return FutureBuilder(
         future: userController.getId(),
-        builder: (_, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+        builder: (_, mobileIdSnapShot) {
+          if (mobileIdSnapShot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator.adaptive(),
             );
-<<<<<<< HEAD
-=======
-          } else if (snapshot.hasData) {
-            return TaskCard(
-              snapshot: snapshot,
-            );
-          } else {
-            return const SizedBox();
->>>>>>> b9d8a419ca5be6f697fa33efd7a28234b6a5bcad
           }
-          if (snapshot.hasError) {
+          if (mobileIdSnapShot.hasError) {
             return const Center(
               child: Text('Error fetching data'),
             );
           }
-          if (snapshot.hasData) {
-            log(snapshot.data.toString());
+          if (mobileIdSnapShot.hasData) {
+            log(mobileIdSnapShot.data.toString());
             return StreamBuilder(
                 stream: FirebaseAuth.instance.currentUser!.isAnonymous
                     ? firestore
                         .collection("Guest")
-                        .doc(snapshot.data)
+                        .doc(mobileIdSnapShot.data)
                         .collection("Tasks")
                         .snapshots()
                     : firestore
@@ -61,6 +52,7 @@ class AllTask extends StatelessWidget {
                   } else if (snapshot.hasData) {
                     return TaskCard(
                       snapshot: snapshot,
+                      mobileId: mobileIdSnapShot.data ?? '',
                     );
                   } else {
                     return const SizedBox();
