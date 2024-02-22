@@ -29,11 +29,14 @@ class HomePage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         backgroundColor: blue,
         tooltip: 'Add Task',
-        onPressed: () => Get.to(() => const AddTask()),
+        onPressed: () =>
+            Get.to(() => const AddTask(), transition: Transition.rightToLeft),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

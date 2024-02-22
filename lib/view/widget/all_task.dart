@@ -24,6 +24,15 @@ class AllTask extends StatelessWidget {
             return const Center(
               child: CircularProgressIndicator.adaptive(),
             );
+<<<<<<< HEAD
+=======
+          } else if (snapshot.hasData) {
+            return TaskCard(
+              snapshot: snapshot,
+            );
+          } else {
+            return const SizedBox();
+>>>>>>> b9d8a419ca5be6f697fa33efd7a28234b6a5bcad
           }
           if (snapshot.hasError) {
             return const Center(

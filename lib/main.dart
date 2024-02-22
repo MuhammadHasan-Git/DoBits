@@ -129,28 +129,6 @@ class MyApp extends StatelessWidget {
             ),
             NavigationDestination(
               selectedIcon: Icon(
-                Icons.task_alt,
-                color: darkBlue,
-              ),
-              icon: Icon(
-                Icons.task_alt,
-                color: Colors.grey,
-              ),
-              label: 'Tasks',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(
-                Icons.bar_chart_rounded,
-                color: darkBlue,
-              ),
-              icon: Icon(
-                Icons.bar_chart_rounded,
-                color: Colors.grey,
-              ),
-              label: 'Insight',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(
                 Icons.person,
                 color: darkBlue,
               ),

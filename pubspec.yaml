@@ -46,10 +46,15 @@ dependencies:
   flutter_svg: ^2.0.9
   flutter_slidable: ^3.0.1
   percent_indicator: ^4.2.3
+<<<<<<< HEAD
   permission_handler: ^11.3.0
   flutter_local_notifications: ^16.3.1
   timezone: ^0.9.2
   flutter_timezone: ^1.0.8
+=======
+  step_progress_indicator: ^1.0.2
+  animate_do: ^3.3.3
+>>>>>>> b9d8a419ca5be6f697fa33efd7a28234b6a5bcad
   # device_info_plus: 3.2.4
   awesome_notifications: ^0.8.2
   awesome_notifications_core: ^0.9.1

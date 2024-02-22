@@ -6,8 +6,11 @@ import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/task_controller.dart';
+import 'package:todo_app/model/category.dart';
+import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
+import 'package:todo_app/view/todo_list.dart';
 import 'package:todo_app/view/widget/popup_button.dart';
 
 class TaskCard extends StatelessWidget {
@@ -22,6 +25,9 @@ class TaskCard extends StatelessWidget {
       itemCount: snapshot?.data != null ? snapshot?.data!.docs.length : 0,
       itemBuilder: (context, index) {
         DocumentSnapshot ds = snapshot?.data!.docs[index];
+        final RxList<SubTasksModel> todos = List<SubTasksModel>.from(
+            (ds['subTasks'] as List).map((e) => SubTasksModel.fromJson(e))).obs;
+        bool isCompleted = ds['isCompleted'];
 
         String formattedDate = TaskController.formattedDate(
           dateString: ds['date'],
@@ -38,162 +44,197 @@ class TaskCard extends StatelessWidget {
                     width: 3.0.wp,
                   ),
                   SlidableAction(
-                    onPressed: (context) {},
-                    backgroundColor: Colors.blue,
-                    icon: Icons.edit,
-                    label: "Edit",
+                    onPressed: (context) => isCompleted
+                        ? homeController.undoCompletedTask(ds.id)
+                        : homeController.completeTask(ds.id),
+                    backgroundColor: isCompleted ? Colors.red : Colors.green,
+                    icon: isCompleted ? Icons.undo : Icons.done,
+                    label: isCompleted ? "Undo" : "Finish",
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ]),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              decoration: BoxDecoration(
-                color: white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: AnimatedOpacity(
+              opacity: isCompleted ? 0.3 : 1,
+              duration: const Duration(milliseconds: 600),
+              child: AbsorbPointer(
+                absorbing: isCompleted,
+                child: Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
                     children: [
-                      IntrinsicHeight(
-                        child: Row(
-                          children: [
-                            Text(
-                              ds['categoryName'],
-                              style: TextStyle(
-                                color: Color(
-                                  int.parse(
-                                    ds['categoryColor'],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IntrinsicHeight(
+                            child: Row(
+                              children: [
+                                Text(
+                                  ds['categoryName'],
+                                  style: TextStyle(
+                                    color: Color(
+                                      int.parse(
+                                        ds['categoryColor'],
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                SizedBox(
+                                  width: 1.0.wp,
+                                ),
+                                const VerticalDivider(
+                                  indent: 3,
+                                  endIndent: 3,
+                                ),
+                                SizedBox(
+                                  width: 1.0.wp,
+                                ),
+                                Text(
+                                  ds['priority'],
+                                  style: TextStyle(
+                                    color: homeController
+                                        .getPriorityColor(ds['priority']),
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(
-                              width: 1.0.wp,
-                            ),
-                            const VerticalDivider(
-                              indent: 3,
-                              endIndent: 3,
-                            ),
-                            SizedBox(
-                              width: 1.0.wp,
-                            ),
-                            Text(
-                              ds['priority'],
-                              style: TextStyle(
-                                color: homeController
-                                    .getPriorityColor(ds['priority']),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                          PopupButton(ds: ds),
+                        ],
                       ),
-                      PopupButton(ds: ds),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 1.5.wp,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 2.0.wp),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                ds['title'],
-                                softWrap: false,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              ds['description'] != null
-                                  ? Text(
-                                      ds['description'],
-                                      softWrap: false,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: grey,
-                                        fontSize: 14,
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                              SizedBox(
-                                height: 1.5.wp,
-                              ),
-                              Row(
+                      SizedBox(
+                        height: 1.5.wp,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 2.0.wp),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        CupertinoIcons.time,
-                                        size: 14,
-                                        color: grey,
-                                      ),
-                                      SizedBox(
-                                        width: 1.0.wp,
-                                      ),
-                                      Text(
-                                        TaskController.formatTime(
-                                          time: DateTime.parse(ds['time']),
-                                        ),
-                                        style: const TextStyle(
-                                            color: grey, fontSize: 12),
-                                      ),
-                                    ],
+                                  Text(
+                                    ds['title'],
+                                    softWrap: false,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: white,
+                                      fontSize: 18,
+                                    ),
                                   ),
+                                  ds['description'] != null
+                                      ? Text(
+                                          ds['description'],
+                                          softWrap: false,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: grey,
+                                            fontSize: 14,
+                                          ),
+                                        )
+                                      : const SizedBox(),
                                   SizedBox(
-                                    width: 3.0.wp,
+                                    height: 1.5.wp,
                                   ),
                                   Row(
                                     children: [
-                                      const Icon(
-                                        Icons.date_range,
-                                        size: 14,
-                                        color: grey,
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            CupertinoIcons.time,
+                                            size: 14,
+                                            color: grey,
+                                          ),
+                                          SizedBox(
+                                            width: 1.0.wp,
+                                          ),
+                                          Text(
+                                            TaskController.formatTime(
+                                              time: DateTime.parse(ds['time']),
+                                            ),
+                                            style: const TextStyle(
+                                                color: grey, fontSize: 12),
+                                          ),
+                                        ],
                                       ),
                                       SizedBox(
-                                        width: 1.0.wp,
+                                        width: 3.0.wp,
                                       ),
-                                      Text(
-                                        formattedDate,
-                                        style: const TextStyle(
-                                            color: grey, fontSize: 12),
-                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.date_range,
+                                            size: 14,
+                                            color: grey,
+                                          ),
+                                          SizedBox(
+                                            width: 1.0.wp,
+                                          ),
+                                          Text(
+                                            formattedDate,
+                                            style: const TextStyle(
+                                                color: grey, fontSize: 12),
+                                          ),
+                                        ],
+                                      )
                                     ],
-                                  )
+                                  ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      CircularPercentIndicator(
-                        radius: 10.0.wp,
-                        animation: true,
-                        lineWidth: 3.0,
-                        percent: 0.5,
-                        backgroundColor: Color(int.parse(ds['categoryColor']))
-                            .withOpacity(0.1),
-                        center: Text(
-                          "100%",
-                          style: TextStyle(
-                              color: Color(int.parse(ds['categoryColor']))),
-                        ),
-                        progressColor: Color(int.parse(ds['categoryColor'])),
-                      ),
+                          todos.isNotEmpty
+                              ? GestureDetector(
+                                  onTap: () => Get.to(
+                                      () => TodoListPage(
+                                            id: ds.id,
+                                            title: ds['title'],
+                                            category: TaskCategory(
+                                              color: int.parse(
+                                                  ds['categoryColor']),
+                                              name: ds['categoryName'],
+                                            ),
+                                          ),
+                                      transition: Transition.downToUp),
+                                  child: CircularPercentIndicator(
+                                    radius: 10.0.wp,
+                                    animateFromLastPercent: true,
+                                    animation: true,
+                                    lineWidth: 5.0,
+                                    percent: (todos
+                                            .where((element) => element.done)
+                                            .length /
+                                        todos.length),
+                                    circularStrokeCap: CircularStrokeCap.round,
+                                    backgroundColor:
+                                        Color(int.parse(ds['categoryColor']))
+                                            .withOpacity(0.1),
+                                    center: Text(
+                                      '${(todos.where((element) => element.done).length / todos.length * 100).toInt().toString()}%',
+                                      style: TextStyle(
+                                        color: Color(
+                                          int.parse(ds['categoryColor']),
+                                        ),
+                                      ),
+                                    ),
+                                    progressColor:
+                                        Color(int.parse(ds['categoryColor'])),
+                                  ),
+                                )
+                              : const SizedBox()
+                        ],
+                      )
                     ],
-                  )
-                ],
+                  ),
+                ),
               ),
             ),
           ),
