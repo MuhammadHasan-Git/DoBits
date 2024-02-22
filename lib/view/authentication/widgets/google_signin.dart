@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/utils/colors.dart';
 
@@ -33,12 +35,19 @@ class GoogleSignInButton extends StatelessWidget {
                 const SizedBox(
                   width: 10,
                 ),
-                const Text(
-                  "Continue With Google",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: white,
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      "Continue With Google",
+                      softWrap: false,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: white,
+                      ),
+                    ),
                   ),
                 ),
               ],

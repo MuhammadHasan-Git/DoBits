@@ -1,14 +1,16 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-
-import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/utils/extensions.dart';
 
 class HomeController extends GetxController {
+  final userCtrl = Get.find<UserController>();
   RxInt index = 0.obs;
   late final String? mobileId;
 
@@ -18,7 +20,68 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  Future<dynamic> alertDialog(DocumentSnapshot ds) {
+  static void customLoadingDialog(String text) {
+    Get.dialog(
+      barrierDismissible: false,
+      FractionallySizedBox(
+        widthFactor: 0.8,
+        child: Dialog(
+          backgroundColor: black,
+          surfaceTintColor: black,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 5.0.wp),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SpinKitFadingCircle(
+                  color: blue,
+                  size: 15.0.wp,
+                ),
+                SizedBox(height: 6.0.wp),
+                Flexible(
+                  child: Text(
+                    text,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void deleteTask(String id) async {
+    try {
+      final taskRef = FirebaseFirestore.instance
+          .collection("Users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("Tasks")
+          .doc(id);
+      await taskRef.delete();
+      Get.back();
+      Fluttertoast.showToast(
+          msg: "Task has been deleted",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Failed to delete task",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  Future<dynamic> alertDialog(id) {
     return Get.dialog(
       AlertDialog(
         backgroundColor: black,
@@ -59,10 +122,7 @@ class HomeController extends GetxController {
                   color: Colors.red,
                 ),
               ),
-              onPressed: () {
-                final taskController = Get.put(TaskController());
-                taskController.deleteTask(ds.id);
-              }),
+              onPressed: () => deleteTask(id)),
         ],
       ),
     );
@@ -70,6 +130,7 @@ class HomeController extends GetxController {
 
   completeTask(String docId) async {
     try {
+      customLoadingDialog("Processing");
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;
       final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
@@ -83,7 +144,6 @@ class HomeController extends GetxController {
               .doc(auth.currentUser!.uid)
               .collection("Tasks")
               .doc(docId);
-
       DocumentSnapshot documentSnapshot = await taskRef.get();
       List<Map<String, dynamic>> existingList =
           List.from(documentSnapshot.get('subTasks'));
@@ -92,6 +152,7 @@ class HomeController extends GetxController {
       }
 
       await taskRef.update({'isCompleted': true, 'subTasks': existingList});
+      Get.back();
 
       Fluttertoast.showToast(
           msg: "Task Completed",
@@ -115,6 +176,7 @@ class HomeController extends GetxController {
 
   undoCompletedTask(String docId) async {
     try {
+      customLoadingDialog("Processing");
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;
       final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
@@ -141,6 +203,7 @@ class HomeController extends GetxController {
         'subTasks': existingList,
         'createdOn': FieldValue.serverTimestamp(),
       });
+      Get.back();
 
       Fluttertoast.showToast(
           msg: "Task Recreated Successfully",

@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/sub_task.dart';
@@ -14,15 +15,17 @@ class SubTask extends StatelessWidget {
     final subTaskController = Get.put(SubTaskController());
     return Column(
       children: [
-        CustomTextField(
-            controller: subTaskController.textControlelr,
-            hintText: 'Subtasks',
-            onFieldSubmitted: (value) {
-              SubTasksModel subTasksModel =
-                  SubTasksModel(subtask: value, done: false);
-              subTaskController.addSubtask(
-                  subTasksModel, subTaskController.subTaskList.length);
-            }),
+        FadeIn(
+          child: CustomTextField(
+              controller: subTaskController.textControlelr,
+              hintText: 'Subtasks',
+              onFieldSubmitted: (value) {
+                SubTasksModel subTasksModel =
+                    SubTasksModel(subtask: value, done: false);
+                subTaskController.addSubtask(
+                    subTasksModel, subTaskController.subTaskList.length);
+              }),
+        ),
         Obx(
           () => AnimatedList(
             shrinkWrap: true,

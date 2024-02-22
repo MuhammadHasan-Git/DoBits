@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/todo_controller.dart';
@@ -41,7 +42,7 @@ class TodoListPage extends StatelessWidget {
         ),
         centerTitle: true,
         title: const Text(
-          "Todo List",
+          "Sub Task List",
           style: TextStyle(color: white),
         ),
       ),
@@ -87,7 +88,7 @@ class TodoListPage extends StatelessWidget {
                           title,
                           style: TextStyle(
                             color: white,
-                            fontSize: 20.0.sp,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -244,7 +245,7 @@ class TodoListPage extends StatelessWidget {
                   ],
                 );
               } else {
-                return SizedBox();
+                return const SizedBox.shrink();
               }
             },
           ),

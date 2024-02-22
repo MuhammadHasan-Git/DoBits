@@ -1,19 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/edit_task_model.dart';
 import 'package:todo_app/model/sub_tasks.dart';
+import 'package:todo_app/model/task.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/add_task.dart';
 
 class PopupButton extends StatelessWidget {
-  final DocumentSnapshot ds;
+  final Task task;
   const PopupButton({
     super.key,
-    required this.ds,
+    required this.task,
   });
 
   @override
@@ -33,18 +34,19 @@ class PopupButton extends StatelessWidget {
             Get.to(
               () => AddTask(
                 editModel: EditTaskModel(
-                    id: ds.id,
-                    title: ds['title'],
-                    description: ds['description'],
-                    date: ds['date'],
-                    time: ds['time'],
+                    id: task.id,
+                    title: task.title,
+                    description: task.description,
+                    date: task.date,
+                    time: task.time,
                     category: TaskCategory(
-                        color: int.parse(ds['categoryColor']),
-                        name: ds['categoryName']),
-                    priorities: ds['priority'],
-                    subtasks: List<SubTasksModel>.from((ds['subTasks'] as List)
+                        color: task.category.color,
+                        name: task.category.name,
+                        createdOn: task.createdOn),
+                    priorities: task.priority,
+                    subtasks: List<SubTasksModel>.from((task.subTasks as List)
                         .map((e) => SubTasksModel.fromJson(e))),
-                    isRemind: ds['isRemind']),
+                    isRemind: task.isRemind),
               ),
             );
           },
@@ -58,16 +60,18 @@ class PopupButton extends StatelessWidget {
               SizedBox(
                 width: 4.0.wp,
               ),
-              const Text(
+              Text(
                 "Edit Task",
                 style: TextStyle(
                   color: Colors.blue,
+                  fontSize: 12.sp,
                 ),
               ),
             ],
           ),
         ),
         PopupMenuItem(
+          onTap: () => homeController.completeTask(task.id),
           child: Row(
             children: [
               const Icon(
@@ -77,17 +81,18 @@ class PopupButton extends StatelessWidget {
               SizedBox(
                 width: 4.0.wp,
               ),
-              const Text(
+              Text(
                 "Mark As Completed",
                 style: TextStyle(
                   color: Colors.green,
+                  fontSize: 12.sp,
                 ),
               ),
             ],
           ),
         ),
         PopupMenuItem(
-          onTap: () => homeController.alertDialog(ds),
+          onTap: () => homeController.alertDialog(task.id),
           child: Row(
             children: [
               const Icon(
@@ -98,10 +103,11 @@ class PopupButton extends StatelessWidget {
               SizedBox(
                 width: 4.0.wp,
               ),
-              const Text(
+              Text(
                 "Delete Task",
                 style: TextStyle(
                   color: Colors.red,
+                  fontSize: 12.sp,
                 ),
               ),
             ],

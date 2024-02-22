@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/sub_task.dart';
 import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
@@ -13,8 +14,6 @@ import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/model/update_task.dart';
 import 'package:todo_app/utils/colors.dart';
-import 'package:todo_app/utils/extensions.dart';
-import 'package:todo_app/view/widget/dialog_content.dart';
 
 class TaskController extends GetxController {
   final EditTaskModel? editTaskModel;
@@ -89,15 +88,6 @@ class TaskController extends GetxController {
   Rx<int> selectedColor = 0xff778CDD.obs;
   RxInt buttonIndex = 0.obs;
 
-  void selectCategory(String name, int color) {
-    defaultCategories.add(TaskCategory(color: color, name: name));
-    Get.back();
-    selectedColor.value = 0xff778CDD;
-    buttonIndex.value = 0;
-    categoryName.clear();
-    selectedDate = null;
-  }
-
   deleteCategory(int index, id) async {
     if (index > 6) {
       await FirebaseFirestore.instance
@@ -108,35 +98,6 @@ class TaskController extends GetxController {
           .delete();
     } else {
       null;
-    }
-  }
-
-  void deleteTask(String id) async {
-    try {
-      final taskRef = FirebaseFirestore.instance
-          .collection("Users")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection("Tasks")
-          .doc(id);
-      await taskRef.delete();
-      Get.back();
-      Fluttertoast.showToast(
-          msg: "Task has been deleted",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    } catch (e) {
-      Fluttertoast.showToast(
-          msg: "Failed to delete task",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0);
     }
   }
 
@@ -152,6 +113,7 @@ class TaskController extends GetxController {
       await taskRef.set({
         'name': category.name,
         'color': category.color,
+        'createdOn': category.createdOn,
       }).then((_) {
         Get.back();
         categoryName.clear();
@@ -224,56 +186,32 @@ class TaskController extends GetxController {
     initialTime =
         TimeOfDay(hour: selectedTime!.hour, minute: selectedTime!.minute);
 
-    TimeOfDay? pickedTime =
-        await showTimePicker(context: context, initialTime: initialTime);
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData(
+            primaryColor: blue,
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: darkBlue,
+              ),
+            ),
+            colorScheme: const ColorScheme.dark(
+              onSurface: blue,
+              primary: black,
+              onPrimary: darkBlue,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
     if (pickedTime != null) {
       selectedTime = timeOfDayToDateTime(pickedTime);
       timeInput.text = formatTime(time: timeOfDayToDateTime(pickedTime));
     }
-  }
-
-  Future<void> dialogBuilder(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: black,
-          surfaceTintColor: black,
-          title: const Text(
-            'Create Category',
-            textAlign: TextAlign.center,
-          ),
-          titleTextStyle: const TextStyle(
-            color: white,
-            fontSize: 24,
-          ),
-          content: const DialogContent(),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: darkBlue),
-              child: const Text('Cancle'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                selectedColor.value = 0xff778CDD;
-                buttonIndex.value = 0;
-                categoryName.clear();
-              },
-            ),
-            TextButton(
-                style: TextButton.styleFrom(foregroundColor: darkBlue),
-                child: const Text('Create'),
-                onPressed: () {
-                  if (categoryKey.currentState!.validate()) {
-                    final category = TaskCategory(
-                        color: selectedColor.value, name: categoryName.text);
-                    createCategory(category);
-                  }
-                }),
-          ],
-        );
-      },
-    );
   }
 
   Future<void> createTask({
@@ -285,28 +223,7 @@ class TaskController extends GetxController {
     required bool isRemind,
     required List<SubTasksModel>? subTasks,
   }) async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Material(
-              color: Colors.transparent,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(
-                    color: darkBlue,
-                  ),
-                  SizedBox(
-                    height: 3.0.wp,
-                  ),
-                  const Text(
-                    "Creating...",
-                    style: TextStyle(color: blue),
-                  )
-                ],
-              ),
-            ));
+    HomeController.customLoadingDialog("Creating Task...");
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
     final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
@@ -332,7 +249,7 @@ class TaskController extends GetxController {
         priority: priority,
         isRemind: isRemind,
         subTasks: subTasks?.toList(),
-        createdOn: FieldValue.serverTimestamp(),
+        createdOn: Timestamp.now(),
         isCompleted: false);
 
     try {
@@ -349,6 +266,7 @@ class TaskController extends GetxController {
         'isRemind': task.isRemind,
         'subTasks': subTasks?.map((e) => e.toJson()),
         'isCompleted': false,
+        'milliseconds': DateTime.parse(task.date).millisecondsSinceEpoch,
       });
       await Fluttertoast.showToast(
           msg: "Task created successfully!",
@@ -413,28 +331,7 @@ class TaskController extends GetxController {
 
   updateTask(UpdateTaskModel updateTaskModel, context) async {
     try {
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => Material(
-                color: Colors.transparent,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(
-                      color: darkBlue,
-                    ),
-                    SizedBox(
-                      height: 3.0.wp,
-                    ),
-                    const Text(
-                      "Updating...",
-                      style: TextStyle(color: blue),
-                    )
-                  ],
-                ),
-              ));
+      HomeController.customLoadingDialog("Updating Task...");
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;
       final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
@@ -450,7 +347,7 @@ class TaskController extends GetxController {
               .doc(updateTaskModel.id);
 
       await taskRef.update({
-        'updatedOn': FieldValue.serverTimestamp(),
+        'updatedOn': Timestamp.now(),
         'title': updateTaskModel.title,
         'date': updateTaskModel.date,
         'description': updateTaskModel.description,
@@ -460,6 +357,8 @@ class TaskController extends GetxController {
         'priority': updateTaskModel.priority,
         'isRemind': updateTaskModel.isRemind,
         'subTasks': updateTaskModel.subTasks!.map((e) => e.toJson()),
+        'milliseconds':
+            DateTime.parse(updateTaskModel.date).millisecondsSinceEpoch,
       });
       Fluttertoast.showToast(
           msg: "Task updated successfully!",

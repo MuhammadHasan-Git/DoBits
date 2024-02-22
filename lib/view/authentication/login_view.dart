@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -68,74 +69,76 @@ class LoginView extends StatelessWidget {
                           const SizedBox(
                             height: 30,
                           ),
-                          AuthTextField(
-                            hintText: "Enter your Email",
-                            icon: const Icon(Icons.email),
-                            keyboardType: TextInputType.emailAddress,
-                            controller: emailController,
-                            obscureText: false,
-                            validator: (value) {
-                              return authController.emailValidator(value);
-                            },
+                          SlideInLeft(
+                            duration: const Duration(
+                              milliseconds: 350,
+                            ),
+                            child: AuthTextField(
+                              hintText: "Enter your Email",
+                              icon: const Icon(Icons.email),
+                              keyboardType: TextInputType.emailAddress,
+                              controller: emailController,
+                              obscureText: false,
+                              validator: (value) {
+                                return authController.emailValidator(value);
+                              },
+                            ),
                           ),
                           const SizedBox(
                             height: 15,
                           ),
                           Obx(
-                            () => AuthTextField(
-                              hintText: "Enter your password",
-                              icon: const Icon(Icons.lock),
-                              controller: passController,
-                              obscureText: authController.isVisibleLogin.value,
-                              onchanged: (value) {
-                                if (value.isNotEmpty) {
-                                  authController.isEmptyLogin.value = false;
-                                } else {
-                                  authController.isEmptyLogin.value = true;
-                                }
-                              },
-                              suffixIcon: authController.isEmptyLogin.value
-                                  ? null
-                                  : IconButton(
-                                      splashRadius: 1,
-                                      icon: Icon(
-                                        authController.isVisibleLogin.value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        size: 25,
+                            () => SlideInLeft(
+                              duration: const Duration(
+                                milliseconds: 350 * 2,
+                              ),
+                              child: AuthTextField(
+                                hintText: "Enter your password",
+                                icon: const Icon(Icons.lock),
+                                controller: passController,
+                                obscureText:
+                                    authController.isVisibleLogin.value,
+                                onchanged: (value) {
+                                  if (value.isNotEmpty) {
+                                    authController.isEmptyLogin.value = false;
+                                  } else {
+                                    authController.isEmptyLogin.value = true;
+                                  }
+                                },
+                                suffixIcon: authController.isEmptyLogin.value
+                                    ? null
+                                    : IconButton(
+                                        splashRadius: 1,
+                                        icon: Icon(
+                                          authController.isVisibleLogin.value
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          size: 25,
+                                        ),
+                                        onPressed: () => authController
+                                                .isVisibleLogin.value =
+                                            !authController
+                                                .isVisibleLogin.value,
                                       ),
-                                      onPressed: () => authController
-                                              .isVisibleLogin.value =
-                                          !authController.isVisibleLogin.value,
-                                    ),
-                              validator: (String? value) {
-                                return authController.passValidator(value);
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            height: 4.0.wp,
-                          ),
-                          const Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "Forgot Password?",
-                              style: TextStyle(
-                                color: blue,
+                                validator: (String? value) {
+                                  return authController.passValidator(value);
+                                },
                               ),
                             ),
                           ),
                           SizedBox(
                             height: 15.0.wp,
                           ),
-                          CustomButton(
-                              text: "Log In",
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  userController.signIn(
-                                      emailController, passController, context);
-                                }
-                              }),
+                          ElasticIn(
+                            child: CustomButton(
+                                text: "Log In",
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    userController.signIn(emailController,
+                                        passController, context);
+                                  }
+                                }),
+                          ),
                           const SizedBox(
                             height: 30,
                           ),
@@ -164,11 +167,15 @@ class LoginView extends StatelessWidget {
                           const SizedBox(
                             height: 25,
                           ),
-                          const GoogleSignInButton(),
+                          SlideInLeft(
+                            child: const GoogleSignInButton(),
+                          ),
                           SizedBox(
                             height: 5.0.wp,
                           ),
-                          const GuestSignInButton(),
+                          SlideInRight(
+                            child: const GuestSignInButton(),
+                          ),
                           SizedBox(
                             height: 15.0.wp,
                           ),

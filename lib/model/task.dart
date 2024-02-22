@@ -4,7 +4,7 @@ import 'package:todo_app/model/sub_tasks.dart';
 
 class Task {
   final String id;
-  final FieldValue createdOn;
+  final Timestamp createdOn;
   final String title;
   final String date;
   final String? description;

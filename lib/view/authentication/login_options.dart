@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,11 +43,14 @@ class LoginOptions extends StatelessWidget {
                         ],
                       )
                     : const SizedBox(),
-                SvgPicture.asset(
-                  'assets/images/login-illustrator.svg',
-                  alignment: Alignment.topCenter,
-                  height: 300,
-                  width: double.infinity,
+                FadeInDown(
+                  duration: const Duration(milliseconds: 1500),
+                  child: SvgPicture.asset(
+                    'assets/images/login-illustrator.svg',
+                    alignment: Alignment.topCenter,
+                    height: 300,
+                    width: double.infinity,
+                  ),
                 ),
                 Text(
                   isGuest! ? "LogIn to Access This Feature" : "Sign In Options",
@@ -55,7 +59,7 @@ class LoginOptions extends StatelessWidget {
                     color: darkBlue,
                     letterSpacing: 2,
                     fontSize: isGuest! ? 20 : 24,
-                    fontWeight: FontWeight.w100,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(
@@ -76,19 +80,22 @@ class LoginOptions extends StatelessWidget {
                 SizedBox(
                   height: 10.0.wp,
                 ),
-                CustomButton(
-                  text: "Login",
-                  onPressed: () => Get.to(
-                      () => Obx(
-                            () => authController.showSignIn.value
-                                ? LoginView(
-                                    toggleView: () =>
-                                        authController.toggleView())
-                                : SignupView(
-                                    toggleView: () =>
-                                        authController.toggleView()),
-                          ),
-                      transition: Transition.downToUp),
+                Bounce(
+                  duration: const Duration(milliseconds: 1500),
+                  child: CustomButton(
+                    text: "Login",
+                    onPressed: () => Get.to(
+                        () => Obx(
+                              () => authController.showSignIn.value
+                                  ? LoginView(
+                                      toggleView: () =>
+                                          authController.toggleView())
+                                  : SignupView(
+                                      toggleView: () =>
+                                          authController.toggleView()),
+                            ),
+                        transition: Transition.downToUp),
+                  ),
                 ),
                 SizedBox(
                   height: 10.0.wp,
@@ -120,11 +127,17 @@ class LoginOptions extends StatelessWidget {
                 SizedBox(
                   height: 10.0.wp,
                 ),
-                const GoogleSignInButton(),
+                SlideInLeft(
+                  duration: const Duration(milliseconds: 1500),
+                  child: const GoogleSignInButton(),
+                ),
                 SizedBox(
                   height: 5.0.wp,
                 ),
-                const GuestSignInButton(),
+                SlideInRight(
+                  duration: const Duration(milliseconds: 1500),
+                  child: const GuestSignInButton(),
+                ),
                 SizedBox(
                   height: 15.0.wp,
                 ),

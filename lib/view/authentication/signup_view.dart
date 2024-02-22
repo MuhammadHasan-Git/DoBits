@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -66,109 +67,23 @@ class SignupView extends StatelessWidget {
                           const SizedBox(
                             height: 15,
                           ),
-                          AuthTextField(
-                            hintText: "Username",
-                            icon: const Icon(Icons.person),
-                            controller: nameController,
-                            keyboardType: TextInputType.name,
-                            obscureText: false,
-                            validator: (value) {
-                              final RegExp nameRegExp =
-                                  RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]');
-                              if (value == null || value.isEmpty) {
-                                return "Please enter your name";
-                              } else if (nameRegExp.hasMatch(value)) {
-                                return "Only characters are allowed";
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          AuthTextField(
-                            hintText: "Email",
-                            icon: const Icon(Icons.email),
-                            controller: emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            obscureText: false,
-                            validator: (value) {
-                              return authController.emailValidator(value);
-                            },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Obx(
-                            () => AuthTextField(
-                              hintText: "Password",
-                              icon: const Icon(Icons.lock),
-                              controller: passController,
-                              obscureText: authController.isVisibleSignin.value,
-                              onchanged: (value) {
-                                if (value.isNotEmpty) {
-                                  authController.isEmptySignin.value = false;
-                                } else {
-                                  authController.isEmptySignin.value = true;
-                                }
-                              },
-                              suffixIcon: authController.isEmptySignin.value
-                                  ? null
-                                  : IconButton(
-                                      splashRadius: 1,
-                                      icon: Icon(
-                                        authController.isVisibleSignin.value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        size: 25,
-                                      ),
-                                      onPressed: () => authController
-                                              .isVisibleSignin.value =
-                                          !authController.isVisibleSignin.value,
-                                    ),
-                              validator: (value) {
-                                return authController.passValidator(value);
-                              },
+                          SlideInLeft(
+                            duration: const Duration(
+                              milliseconds: 350 * 1,
                             ),
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Obx(
-                            () => AuthTextField(
-                              hintText: "Confirm Password",
-                              icon: const Icon(Icons.lock),
-                              controller: confirmPassController,
-                              obscureText:
-                                  authController.isVisibleSignin1.value,
-                              onchanged: (value) {
-                                if (value.isNotEmpty) {
-                                  authController.isEmptySignin1.value = false;
-                                } else {
-                                  authController.isEmptySignin1.value = true;
-                                }
-                              },
-                              suffixIcon: authController.isEmptySignin1.value
-                                  ? null
-                                  : IconButton(
-                                      splashRadius: 1,
-                                      icon: Icon(
-                                        authController.isVisibleSignin1.value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        size: 25,
-                                      ),
-                                      onPressed: () => authController
-                                              .isVisibleSignin1.value =
-                                          !authController
-                                              .isVisibleSignin1.value,
-                                    ),
+                            child: AuthTextField(
+                              hintText: "Username",
+                              icon: const Icon(Icons.person),
+                              controller: nameController,
+                              keyboardType: TextInputType.name,
+                              obscureText: false,
                               validator: (value) {
+                                final RegExp nameRegExp =
+                                    RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]');
                                 if (value == null || value.isEmpty) {
-                                  return "Please enter the password";
-                                } else if (value != passController.text) {
-                                  return 'Password does not match';
+                                  return "Please enter your name";
+                                } else if (nameRegExp.hasMatch(value)) {
+                                  return "Only characters are allowed";
                                 } else {
                                   return null;
                                 }
@@ -176,16 +91,126 @@ class SignupView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(
+                            height: 15,
+                          ),
+                          SlideInLeft(
+                            duration: const Duration(
+                              milliseconds: 350 * 2,
+                            ),
+                            child: AuthTextField(
+                              hintText: "Email",
+                              icon: const Icon(Icons.email),
+                              controller: emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              obscureText: false,
+                              validator: (value) {
+                                return authController.emailValidator(value);
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Obx(
+                            () => SlideInLeft(
+                              duration: const Duration(
+                                milliseconds: 350 * 3,
+                              ),
+                              child: AuthTextField(
+                                hintText: "Password",
+                                icon: const Icon(Icons.lock),
+                                controller: passController,
+                                obscureText:
+                                    authController.isVisibleSignin.value,
+                                onchanged: (value) {
+                                  if (value.isNotEmpty) {
+                                    authController.isEmptySignin.value = false;
+                                  } else {
+                                    authController.isEmptySignin.value = true;
+                                  }
+                                },
+                                suffixIcon: authController.isEmptySignin.value
+                                    ? null
+                                    : IconButton(
+                                        splashRadius: 1,
+                                        icon: Icon(
+                                          authController.isVisibleSignin.value
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          size: 25,
+                                        ),
+                                        onPressed: () => authController
+                                                .isVisibleSignin.value =
+                                            !authController
+                                                .isVisibleSignin.value,
+                                      ),
+                                validator: (value) {
+                                  return authController.passValidator(value);
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Obx(
+                            () => SlideInLeft(
+                              duration: const Duration(
+                                milliseconds: 350 * 4,
+                              ),
+                              child: AuthTextField(
+                                hintText: "Confirm Password",
+                                icon: const Icon(Icons.lock),
+                                controller: confirmPassController,
+                                obscureText:
+                                    authController.isVisibleSignin1.value,
+                                onchanged: (value) {
+                                  if (value.isNotEmpty) {
+                                    authController.isEmptySignin1.value = false;
+                                  } else {
+                                    authController.isEmptySignin1.value = true;
+                                  }
+                                },
+                                suffixIcon: authController.isEmptySignin1.value
+                                    ? null
+                                    : IconButton(
+                                        splashRadius: 1,
+                                        icon: Icon(
+                                          authController.isVisibleSignin1.value
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          size: 25,
+                                        ),
+                                        onPressed: () => authController
+                                                .isVisibleSignin1.value =
+                                            !authController
+                                                .isVisibleSignin1.value,
+                                      ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Please enter the password";
+                                  } else if (value != passController.text) {
+                                    return 'Password does not match';
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
                             height: 50,
                           ),
-                          CustomButton(
-                            text: "SignUp",
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                await userController.signUp(nameController,
-                                    emailController, passController, context);
-                              }
-                            },
+                          ElasticIn(
+                            child: CustomButton(
+                              text: "SignUp",
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  await userController.signUp(nameController,
+                                      emailController, passController, context);
+                                }
+                              },
+                            ),
                           ),
                           const SizedBox(
                             height: 30,
@@ -215,11 +240,11 @@ class SignupView extends StatelessWidget {
                           const SizedBox(
                             height: 25,
                           ),
-                          const GoogleSignInButton(),
+                          SlideInLeft(child: const GoogleSignInButton()),
                           SizedBox(
                             height: 5.0.wp,
                           ),
-                          const GuestSignInButton(),
+                          SlideInRight(child: const GuestSignInButton()),
                           SizedBox(
                             height: 10.0.wp,
                           ),

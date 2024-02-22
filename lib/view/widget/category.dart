@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/edit_task_model.dart';
@@ -22,6 +23,7 @@ class CategoryList extends StatelessWidget {
             .collection("Users")
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .collection("Categories")
+            .orderBy('createdOn')
             .snapshots(),
         builder: (context, AsyncSnapshot snapshot) {
           taskController.categories.value = [
@@ -32,10 +34,10 @@ class CategoryList extends StatelessWidget {
               snapshot.data.docs.map(
                 (DocumentSnapshot doc) {
                   return TaskCategory(
-                    id: doc.id,
-                    color: doc['color'],
-                    name: doc['name'],
-                  );
+                      id: doc.id,
+                      color: doc['color'],
+                      name: doc['name'],
+                      createdOn: doc['createdOn']);
                 },
               ).toList(),
             );
@@ -54,7 +56,8 @@ class CategoryList extends StatelessWidget {
                                   ),
                               transition: Transition.downToUp);
                         } else {
-                          taskController.dialogBuilder(context);
+                          HomeController.customLoadingDialog(
+                              "Ctreating Category");
                         }
                       },
                       splashFactory: NoSplash.splashFactory,

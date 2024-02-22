@@ -6,8 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/main.dart';
-import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/services/shared_preferences_service.dart';
 import 'package:todo_app/utils/extensions.dart';
 
 class UserController extends GetxController {
@@ -45,6 +46,20 @@ class UserController extends GetxController {
     return null;
   }
 
+  static Widget getProfileImage() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    if (auth.currentUser?.photoURL != null) {
+      return CircleAvatar(
+        backgroundImage: NetworkImage(auth.currentUser!.photoURL.toString()),
+      );
+    } else {
+      return Icon(
+        Icons.account_circle,
+        size: 10.0.wp,
+      );
+    }
+  }
+
   void updateSigninTime() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -54,7 +69,7 @@ class UserController extends GetxController {
     });
   }
 
-  void createUser(String userName, String email) async {
+  Future<void> createUser(String userName, String email) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     final userRef = firestore.collection("Users").doc(auth.currentUser!.uid);
@@ -85,15 +100,13 @@ class UserController extends GetxController {
       TextEditingController passwordController,
       context) async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()));
+    HomeController.customLoadingDialog("Processing...");
     try {
+      await SharedPreferencesService.saveData('username', nameController.text);
       await auth.createUserWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim());
-      createUser(nameController.text.trim(), emailController.text.trim());
+      await createUser(nameController.text.trim(), emailController.text.trim());
     } on FirebaseAuthException catch (e) {
       Get.showSnackbar(
         GetSnackBar(
@@ -108,25 +121,7 @@ class UserController extends GetxController {
 
   Future<void> signInAnon(BuildContext context) async {
     try {
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(
-                    color: darkBlue,
-                  ),
-                  SizedBox(
-                    height: 3.0.wp,
-                  ),
-                  const Text(
-                    "Logging in...",
-                    style: TextStyle(color: blue),
-                  )
-                ],
-              ));
+      HomeController.customLoadingDialog("Processing...");
       final auth = FirebaseAuth.instance;
       await auth.signInAnonymously();
       createGuest();
@@ -147,25 +142,7 @@ class UserController extends GetxController {
     FirebaseAuth auth = FirebaseAuth.instance;
 
     try {
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(
-                    color: darkBlue,
-                  ),
-                  SizedBox(
-                    height: 3.0.wp,
-                  ),
-                  const Text(
-                    "Logging in...",
-                    style: TextStyle(color: blue),
-                  )
-                ],
-              ));
+      HomeController.customLoadingDialog("Processing...");
       await auth.signInWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim());
@@ -188,25 +165,7 @@ class UserController extends GetxController {
   }
 
   Future loginWithGoogle(context) async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(
-                  color: darkBlue,
-                ),
-                SizedBox(
-                  height: 3.0.wp,
-                ),
-                const Text(
-                  "Processing...",
-                  style: TextStyle(color: blue),
-                )
-              ],
-            ));
+    HomeController.customLoadingDialog("Processing...");
     try {
       final googleAccount = await GoogleSignIn().signIn();
       final googleAuth = await googleAccount?.authentication;

@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 
@@ -10,41 +15,47 @@ class TaskReport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
-      decoration: BoxDecoration(
-        color: blue,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        children: [
-          const Text(
-            'Task Report',
-            style: TextStyle(
-              color: white,
-              fontSize: 24,
-            ),
-          ),
-          SizedBox(
-            height: 4.0.wp,
-          ),
-          IntrinsicHeight(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  flex: 2,
-                  child: Column(
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final homeCtrl = Get.put(HomeController());
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.currentUser!.isAnonymous
+          ? firestore
+              .collection("Guest")
+              .doc(homeCtrl.mobileId)
+              .collection("Tasks")
+              .snapshots()
+          : firestore
+              .collection("Users")
+              .doc(auth.currentUser!.uid)
+              .collection("Tasks")
+              .snapshots(),
+      builder: (BuildContext context,
+          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+        final int totalTask = snapshot.data?.docs.length ?? 0;
+        int? completedTask = snapshot.data != null
+            ? (snapshot.data?.docs as List)
+                .where((element) => element.data()!['isCompleted'] == true)
+                .length
+            : 0;
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 8.sp,
+                            height: 8.sp,
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.transparent,
@@ -56,25 +67,25 @@ class TaskReport extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          const Text(
-                            "Total Task : 0",
+                          Text(
+                            "Total Task : $totalTask",
                             style: TextStyle(
                               color: white,
-                              fontSize: 16,
+                              fontSize: 14.sp,
                             ),
                           ),
                         ],
                       ),
                       SizedBox(
-                        height: 2.0.wp,
+                        height: 3.0.wp,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 8.sp,
+                            height: 8.sp,
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.transparent,
@@ -86,25 +97,25 @@ class TaskReport extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          const Text(
-                            "In Progress : 0",
+                          Text(
+                            "Live : ${totalTask - completedTask}",
                             style: TextStyle(
                               color: white,
-                              fontSize: 16,
+                              fontSize: 14.sp,
                             ),
                           ),
                         ],
                       ),
                       SizedBox(
-                        height: 2.0.wp,
+                        height: 3.0.wp,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 8.sp,
+                            height: 8.sp,
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.transparent,
@@ -116,41 +127,38 @@ class TaskReport extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          const Text(
-                            "Completed : 0",
+                          Text(
+                            "Completed : $completedTask",
                             style: TextStyle(
                               color: white,
-                              fontSize: 16,
+                              fontSize: 14.sp,
                             ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                ),
-                const VerticalDivider(
-                  color: white,
-                ),
-                Flexible(
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: CircularPercentIndicator(
-                      radius: 12.0.wp,
-                      lineWidth: 5.0,
-                      percent: 1.0,
-                      center: const Text(
-                        "100%",
-                        style: TextStyle(color: white),
-                      ),
-                      progressColor: const Color(0xFF7fff00),
-                    ),
+                  const VerticalDivider(
+                    color: white,
                   ),
-                ),
-              ],
+                  CircularPercentIndicator(
+                    backgroundColor: white.withOpacity(0.2),
+                    radius: 12.0.wp,
+                    lineWidth: 5.0,
+                    circularStrokeCap: CircularStrokeCap.round,
+                    percent: totalTask == 0 ? 0 : completedTask / totalTask,
+                    center: Text(
+                      "${totalTask == 0 ? 0 : (completedTask / totalTask * 100).toStringAsFixed(0)} %",
+                      style: const TextStyle(color: white),
+                    ),
+                    progressColor: const Color(0xFF7fff00),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 }

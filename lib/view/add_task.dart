@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/sub_task.dart';
@@ -35,7 +36,7 @@ class AddTask extends StatelessWidget {
             icon: const Icon(Icons.arrow_back),
           ),
           title: Text(
-            editModel != null ? "Edit Task" : "New Task",
+            editModel != null ? "Edit Task" : "Create Task",
             style: const TextStyle(color: white),
           ),
           centerTitle: true,
@@ -57,17 +58,19 @@ class AddTask extends StatelessWidget {
                   const SizedBox(
                     height: 5,
                   ),
-                  CustomTextField(
-                    width: double.infinity,
-                    autofocus: editModel == null,
-                    controller: taskController.titleController,
-                    hintText: 'e.g. Read a book',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter task name";
-                      }
-                      return null;
-                    },
+                  FadeIn(
+                    child: CustomTextField(
+                      width: double.infinity,
+                      autofocus: editModel == null,
+                      controller: taskController.titleController,
+                      hintText: 'e.g. Read a book',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter task name";
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                   const SizedBox(
                     height: 30,
@@ -90,12 +93,14 @@ class AddTask extends StatelessWidget {
                             const SizedBox(
                               height: 5,
                             ),
-                            CustomTextField(
-                              controller: taskController.dateInput,
-                              textAlign: TextAlign.center,
-                              readOnly: true,
-                              onTap: () =>
-                                  taskController.displayDatePicker(context),
+                            FadeIn(
+                              child: CustomTextField(
+                                controller: taskController.dateInput,
+                                textAlign: TextAlign.center,
+                                readOnly: true,
+                                onTap: () =>
+                                    taskController.displayDatePicker(context),
+                              ),
                             ),
                           ],
                         ),
@@ -117,12 +122,14 @@ class AddTask extends StatelessWidget {
                             const SizedBox(
                               height: 5,
                             ),
-                            CustomTextField(
-                              textAlign: TextAlign.center,
-                              controller: taskController.timeInput,
-                              readOnly: true,
-                              onTap: () => taskController.displayTimePicker(
-                                  context, taskController.timeInput),
+                            FadeIn(
+                              child: CustomTextField(
+                                textAlign: TextAlign.center,
+                                controller: taskController.timeInput,
+                                readOnly: true,
+                                onTap: () => taskController.displayTimePicker(
+                                    context, taskController.timeInput),
+                              ),
                             )
                           ],
                         ),
@@ -141,10 +148,12 @@ class AddTask extends StatelessWidget {
                   const SizedBox(
                     height: 5,
                   ),
-                  CustomTextField(
-                    width: double.infinity,
-                    controller: taskController.descriptionController,
-                    hintText: 'Description',
+                  FadeIn(
+                    child: CustomTextField(
+                      width: double.infinity,
+                      controller: taskController.descriptionController,
+                      hintText: 'Description',
+                    ),
                   ),
                   const SizedBox(
                     height: 30,
