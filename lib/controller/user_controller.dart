@@ -11,7 +11,7 @@ import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 
 class UserController extends GetxController {
-  static Future<String?> getId() async {
+   Future<String?> getId() async {
     var deviceInfo = DeviceInfoPlugin();
 
     if (Platform.isIOS) {

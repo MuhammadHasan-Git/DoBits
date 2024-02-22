@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/get_core.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:todo_app/services/notification_service.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/view/add_task.dart';
 import 'package:todo_app/view/widget/task_report.dart';
@@ -11,6 +13,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NotificationServices notificationServices = NotificationServices();
+
+   
     return Scaffold(
       body: const SafeArea(
         child: Padding(

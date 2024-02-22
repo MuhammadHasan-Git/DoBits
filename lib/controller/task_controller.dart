@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:math' as math;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,7 @@ import 'package:todo_app/model/edit_task_model.dart';
 import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/model/update_task.dart';
+import 'package:todo_app/services/notification_service.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/dialog_content.dart';
@@ -309,10 +313,11 @@ class TaskController extends GetxController {
             ));
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
+    UserController userController = Get.find<UserController>();
     final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
         ? firestore
             .collection("Guest")
-            .doc(await UserController.getId())
+            .doc(await userController.getId())
             .collection("Tasks")
             .doc()
         : firestore
@@ -333,7 +338,19 @@ class TaskController extends GetxController {
       subTasks: subTasks?.toList(),
       createdOn: FieldValue.serverTimestamp(),
     );
-
+    log('selectedTime: $selectedTime');
+    if (isRemind) {
+      NotificationServices().zonedScheduleNotification(
+        title: '👋DoBits!',
+        selectedTime: DateTime.now().add(const Duration(seconds: 3)),
+        body: task.title,
+      );
+    }
+    // NotificationHelper().scheduledNotification(
+    //   scheduledDate: selectedTime ?? DateTime.now(),
+    //   id: math.Random().nextInt(100),
+    //   title: title,
+    // );
     try {
       await taskRef.set({
         'id': taskRef.id,
@@ -379,7 +396,9 @@ class TaskController extends GetxController {
   @override
   void onInit() async {
     final subTaskController = Get.put(SubTaskController());
-    mobileId = await UserController.getId();
+    UserController userController = Get.find<UserController>();
+
+    mobileId = await userController.getId();
     titleController.text = editTaskModel?.title ?? '';
     dateInput.text = editTaskModel?.date != null
         ? formattedDate(dateString: editTaskModel!.date)
