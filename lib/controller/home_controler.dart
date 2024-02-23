@@ -6,19 +6,13 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/user_controller.dart';
+
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 
 class HomeController extends GetxController {
   final userCtrl = Get.find<UserController>();
   RxInt index = 0.obs;
-  late final String? mobileId;
-
-  @override
-  Future<void> onInit() async {
-    mobileId = await UserController.getId();
-    super.onInit();
-  }
 
   static void customLoadingDialog(String text) {
     Get.dialog(
@@ -41,7 +35,7 @@ class HomeController extends GetxController {
                 Flexible(
                   child: Text(
                     text,
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16, color: white),
                   ),
                 ),
               ],
@@ -128,9 +122,9 @@ class HomeController extends GetxController {
     );
   }
 
-  completeTask(String docId) async {
+  completeTask(String docId, String mobileId) async {
     try {
-      customLoadingDialog("Processing");
+      customLoadingDialog("Processing...");
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;
       final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
@@ -174,9 +168,9 @@ class HomeController extends GetxController {
     }
   }
 
-  undoCompletedTask(String docId) async {
+  undoCompletedTask(String docId, String mobileId) async {
     try {
-      customLoadingDialog("Processing");
+      customLoadingDialog("Processing...");
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;
       final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous

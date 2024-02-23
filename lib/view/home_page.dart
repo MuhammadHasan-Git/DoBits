@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,11 +13,12 @@ import 'package:todo_app/view/widget/task_report.dart';
 import 'package:todo_app/view/widget/task_tab.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final String mobileId;
+  const HomePage({super.key, required this.mobileId});
 
   @override
   Widget build(BuildContext context) {
-    var width = Get.width;
+    final double width = Get.width;
     return Scaffold(
       backgroundColor: blue,
       appBar: PreferredSize(
@@ -25,42 +28,41 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                 horizontal: 15,
               ),
-              child: FittedBox(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        UserController.getProfileImage(),
-                        SizedBox(
-                          width: 2.0.wp,
-                        ),
-                        Text(
-                          'Welcome! ${FirebaseAuth.instance.currentUser!.displayName != null ? FirebaseAuth.instance.currentUser?.displayName : (FirebaseAuth.instance.currentUser!.isAnonymous ? 'Anonymous' : SharedPreferencesService.getData('username'))}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: white,
-                            fontSize: 14.sp,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      width: 2.0.wp,
-                    ),
-                    IconButton(
-                      onPressed: () => UserController.signOut(),
-                      style: const ButtonStyle(
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.red,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      UserController.getProfileImage(),
+                      SizedBox(
+                        width: 2.0.wp,
                       ),
+                      Text(
+                        'Welcome! ${FirebaseAuth.instance.currentUser!.displayName != null ? FirebaseAuth.instance.currentUser?.displayName : (FirebaseAuth.instance.currentUser!.isAnonymous ? 'Anonymous' : SharedPreferencesService.getData('username'))}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: white,
+                          fontSize: 14.sp,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    width: 2.0.wp,
+                  ),
+                  IconButton(
+                    onPressed: () => UserController.signOut(),
+                    style: const ButtonStyle(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                    icon: Icon(
+                      Icons.logout,
+                      color: Colors.red,
+                      size: 8.0.wp,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           )),
@@ -74,11 +76,10 @@ class HomePage extends StatelessWidget {
             decoration: const BoxDecoration(
               color: blue,
             ),
-            child: const TaskReport(),
+            child: TaskReport(mobileId: mobileId),
           ),
           Expanded(
             child: Container(
-              width: width,
               decoration: const BoxDecoration(
                 color: black,
                 borderRadius: BorderRadius.only(
@@ -86,9 +87,9 @@ class HomePage extends StatelessWidget {
                   topRight: Radius.circular(25),
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: TaskBarView(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: TaskBarView(mobileId: mobileId),
               ),
             ),
           ),

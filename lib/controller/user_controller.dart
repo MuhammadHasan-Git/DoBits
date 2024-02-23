@@ -12,7 +12,7 @@ import 'package:todo_app/services/shared_preferences_service.dart';
 import 'package:todo_app/utils/extensions.dart';
 
 class UserController extends GetxController {
-  static Future<String?> getId() async {
+  Future<String?> getId() async {
     var deviceInfo = DeviceInfoPlugin();
 
     if (Platform.isIOS) {
@@ -50,6 +50,7 @@ class UserController extends GetxController {
     FirebaseAuth auth = FirebaseAuth.instance;
     if (auth.currentUser?.photoURL != null) {
       return CircleAvatar(
+        radius: 5.0.wp,
         backgroundImage: NetworkImage(auth.currentUser!.photoURL.toString()),
       );
     } else {
@@ -84,7 +85,7 @@ class UserController extends GetxController {
 
   void createGuest() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final String? id = await getId();
+    final String id = SharedPreferencesService.getData('guestId').toString();
     final userRef = firestore.collection("Guest").doc(id);
     await userRef.set(
       {
@@ -124,6 +125,7 @@ class UserController extends GetxController {
       HomeController.customLoadingDialog("Processing...");
       final auth = FirebaseAuth.instance;
       await auth.signInAnonymously();
+      await SharedPreferencesService.saveData('guestId', await getId());
       createGuest();
     } on FirebaseAuthException catch (e) {
       Get.showSnackbar(

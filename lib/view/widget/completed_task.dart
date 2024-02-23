@@ -2,26 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/view/task_list.dart';
 
 class CompletedTask extends StatelessWidget {
-  const CompletedTask({super.key});
+  const CompletedTask({super.key, required this.mobileId});
+  final String mobileId;
 
   @override
   Widget build(BuildContext context) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
-    final homeControler = Get.put(HomeController());
 
     return StreamBuilder(
         stream: FirebaseAuth.instance.currentUser!.isAnonymous
             ? firestore
                 .collection("Guest")
-                .doc(homeControler.mobileId)
+                .doc(mobileId)
                 .collection("Tasks")
+                .orderBy('createdOn')
                 .where(
                   'isCompleted',
                   isEqualTo: true,
@@ -31,10 +30,8 @@ class CompletedTask extends StatelessWidget {
                 .collection("Users")
                 .doc(auth.currentUser!.uid)
                 .collection("Tasks")
-                .where(
-                  'isCompleted',
-                  isEqualTo: true,
-                )
+                .orderBy('createdOn')
+                .where('isCompleted', isEqualTo: true)
                 .snapshots(),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -57,7 +54,10 @@ class CompletedTask extends StatelessWidget {
               ),
             );
           } else if (snapshot.hasData) {
-            return TaskList(snapshot: snapshot);
+            return TaskList(
+              snapshot: snapshot,
+              mobileId: mobileId,
+            );
           }
           return const Center(
             child: Text(

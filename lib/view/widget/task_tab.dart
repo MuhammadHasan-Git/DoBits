@@ -6,7 +6,8 @@ import 'package:todo_app/view/widget/inprogress_task.dart';
 import 'package:todo_app/view/widget/todo_task.dart';
 
 class TaskBarView extends StatefulWidget {
-  const TaskBarView({super.key});
+  const TaskBarView({super.key, required this.mobileId});
+  final String mobileId;
 
   @override
   State<TaskBarView> createState() => _TaskBarViewState();
@@ -17,6 +18,7 @@ class _TaskBarViewState extends State<TaskBarView>
   @override
   Widget build(BuildContext context) {
     TabController tabController = TabController(length: 4, vsync: this);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -68,11 +70,11 @@ class _TaskBarViewState extends State<TaskBarView>
         Expanded(
           child: TabBarView(
             controller: tabController,
-            children: const [
-              TodoTask(),
-              CompletedTask(),
-              InProgressTask(),
-              PendingTask(),
+            children: [
+              TodoTask(mobileId: widget.mobileId),
+              CompletedTask(mobileId: widget.mobileId),
+              InProgressTask(mobileId: widget.mobileId),
+              PendingTask(mobileId: widget.mobileId),
             ],
           ),
         )

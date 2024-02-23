@@ -7,7 +7,11 @@ import 'package:todo_app/view/widget/task_card.dart';
 
 class TaskList extends StatelessWidget {
   const TaskList(
-      {super.key, required this.snapshot, this.showCompletedTask = false});
+      {super.key,
+      required this.snapshot,
+      this.showCompletedTask = false,
+      required this.mobileId});
+  final String mobileId;
   final bool showCompletedTask;
   final AsyncSnapshot snapshot;
 
@@ -38,7 +42,13 @@ class TaskList extends StatelessWidget {
                   ),
                 ),
                 isCompleted: ds['isCompleted']);
-            return TaskCard(task: task, index: index);
+            return 
+              TaskCard(
+                    task: task,
+                    index: index,
+                    mobileId: mobileId,
+                  )
+               ;
           } else {
             return const SizedBox();
           }

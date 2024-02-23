@@ -4,27 +4,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:todo_app/controller/home_controler.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:todo_app/controller/todo_controller.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 
 class TodoListPage extends StatelessWidget {
   final String title;
   final TaskCategory category;
   final String id;
+  final String mobileId;
   const TodoListPage(
       {super.key,
       required this.title,
       required this.category,
+      required this.mobileId,
       required this.id});
 
   @override
   Widget build(BuildContext context) {
-    final homeCtrl = Get.put(HomeController());
     final todoCtrl = Get.put(TodoControlelr());
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -53,7 +53,7 @@ class TodoListPage extends StatelessWidget {
             stream: FirebaseAuth.instance.currentUser!.isAnonymous
                 ? firestore
                     .collection("Guest")
-                    .doc(homeCtrl.mobileId)
+                    .doc(mobileId)
                     .collection("Tasks")
                     .doc(id)
                     .snapshots()
@@ -200,7 +200,7 @@ class TodoListPage extends StatelessWidget {
                                               onChanged: (value) {
                                                 todoCtrl.doneTodo(
                                                     id,
-                                                    homeCtrl.mobileId,
+                                                    mobileId,
                                                     value,
                                                     index,
                                                     todos[index].subtask);
@@ -245,7 +245,7 @@ class TodoListPage extends StatelessWidget {
                   ],
                 );
               } else {
-                return const SizedBox.shrink();
+                return const SizedBox();
               }
             },
           ),

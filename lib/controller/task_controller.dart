@@ -6,13 +6,14 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/sub_task.dart';
-import 'package:todo_app/controller/user_controller.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/model/category.dart';
 import 'package:todo_app/model/edit_task_model.dart';
 import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/model/update_task.dart';
+import 'package:todo_app/services/notification_service.dart';
+import 'package:todo_app/services/shared_preferences_service.dart';
 import 'package:todo_app/utils/colors.dart';
 
 class TaskController extends GetxController {
@@ -229,7 +230,7 @@ class TaskController extends GetxController {
     final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
         ? firestore
             .collection("Guest")
-            .doc(await UserController.getId())
+            .doc(SharedPreferencesService.getData('guestId').toString())
             .collection("Tasks")
             .doc()
         : firestore
@@ -238,20 +239,26 @@ class TaskController extends GetxController {
             .collection("Tasks")
             .doc();
     final task = Task(
-        id: taskRef.id,
-        title: title,
-        date:
-            selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-        description: description == '' ? null : description,
-        time: selectedTime?.toIso8601String() ??
-            timeOfDayToDateTime(TimeOfDay.now()).toIso8601String(),
-        category: category,
-        priority: priority,
-        isRemind: isRemind,
-        subTasks: subTasks?.toList(),
-        createdOn: Timestamp.now(),
-        isCompleted: false);
-
+      id: taskRef.id,
+      title: title,
+      date: selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+      description: description == '' ? null : description,
+      time: selectedTime?.toIso8601String() ??
+          timeOfDayToDateTime(TimeOfDay.now()).toIso8601String(),
+      category: category,
+      priority: priority,
+      isRemind: isRemind,
+      subTasks: subTasks?.toList(),
+      createdOn: Timestamp.now(),
+      isCompleted: false,
+    );
+    if (isRemind) {
+      NotificationServices().zonedScheduleNotification(
+        title: '👋DoBits!',
+        selectedTime: DateTime.parse(task.time),
+        body: task.title,
+      );
+    }
     try {
       await taskRef.set({
         'id': taskRef.id,
@@ -299,7 +306,8 @@ class TaskController extends GetxController {
   @override
   void onInit() async {
     final subTaskController = Get.put(SubTaskController());
-    mobileId = await UserController.getId();
+
+    mobileId = SharedPreferencesService.getData('guestId').toString();
     titleController.text = editTaskModel?.title ?? '';
     dateInput.text = editTaskModel?.date != null
         ? formattedDate(dateString: editTaskModel!.date)
@@ -360,6 +368,13 @@ class TaskController extends GetxController {
         'milliseconds':
             DateTime.parse(updateTaskModel.date).millisecondsSinceEpoch,
       });
+      if (updateTaskModel.isRemind) {
+        NotificationServices().zonedScheduleNotification(
+          title: '👋DoBits!',
+          selectedTime: DateTime.parse(updateTaskModel.time),
+          body: updateTaskModel.title,
+        );
+      }
       Fluttertoast.showToast(
           msg: "Task updated successfully!",
           toastLength: Toast.LENGTH_SHORT,

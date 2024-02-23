@@ -12,9 +12,11 @@ import 'package:todo_app/view/add_task.dart';
 
 class PopupButton extends StatelessWidget {
   final Task task;
+  final String mobileId;
   const PopupButton({
     super.key,
     required this.task,
+    required this.mobileId,
   });
 
   @override
@@ -44,8 +46,7 @@ class PopupButton extends StatelessWidget {
                         name: task.category.name,
                         createdOn: task.createdOn),
                     priorities: task.priority,
-                    subtasks: List<SubTasksModel>.from((task.subTasks as List)
-                        .map((e) => SubTasksModel.fromJson(e))),
+                    subtasks: task.subTasks,
                     isRemind: task.isRemind),
               ),
             );
@@ -71,7 +72,7 @@ class PopupButton extends StatelessWidget {
           ),
         ),
         PopupMenuItem(
-          onTap: () => homeController.completeTask(task.id),
+          onTap: () => homeController.completeTask(task.id, mobileId),
           child: Row(
             children: [
               const Icon(

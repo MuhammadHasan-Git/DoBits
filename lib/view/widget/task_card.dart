@@ -15,7 +15,12 @@ import 'package:todo_app/view/todo_list.dart';
 import 'package:todo_app/view/widget/popup_button.dart';
 
 class TaskCard extends StatelessWidget {
-  const TaskCard({super.key, required this.task, required this.index});
+  const TaskCard(
+      {super.key,
+      required this.task,
+      required this.index,
+      required this.mobileId});
+  final String mobileId;
   final Task task;
   final int index;
 
@@ -41,8 +46,11 @@ class TaskCard extends StatelessWidget {
               ),
               SlidableAction(
                 onPressed: (context) => task.isCompleted
-                    ? homeController.undoCompletedTask(task.id)
-                    : homeController.completeTask(task.id),
+                    ? homeController.undoCompletedTask(
+                        task.id,
+                        mobileId,
+                      )
+                    : homeController.completeTask(task.id, mobileId),
                 backgroundColor: task.isCompleted ? Colors.blue : Colors.green,
                 icon: task.isCompleted ? Icons.undo : Icons.done,
                 label: task.isCompleted ? null : "Finish",
@@ -112,7 +120,10 @@ class TaskCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        PopupButton(task: task),
+                        PopupButton(
+                          task: task,
+                          mobileId: mobileId,
+                        ),
                       ],
                     ),
                     SizedBox(
@@ -204,6 +215,7 @@ class TaskCard extends StatelessWidget {
                                 onTap: () => Get.to(
                                     () => TodoListPage(
                                           id: task.id,
+                                          mobileId: mobileId,
                                           title: task.title,
                                           category: TaskCategory(
                                             color: task.category.color,
