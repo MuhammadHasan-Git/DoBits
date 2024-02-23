@@ -6,11 +6,12 @@ import 'package:todo_app/model/task.dart';
 import 'package:todo_app/view/widget/task_card.dart';
 
 class TaskList extends StatelessWidget {
-  const TaskList(
-      {super.key,
-      required this.snapshot,
-      this.showCompletedTask = false,
-      required this.mobileId});
+  const TaskList({
+    super.key,
+    required this.snapshot,
+    this.showCompletedTask = false,
+    required this.mobileId,
+  });
   final String mobileId;
   final bool showCompletedTask;
   final AsyncSnapshot snapshot;
@@ -20,8 +21,6 @@ class TaskList extends StatelessWidget {
     return ListView.builder(
         itemCount: snapshot.data != null ? snapshot.data!.docs.length : 0,
         itemBuilder: (context, index) {
-          // final category = TaskCategory(
-          //     color: int.parse(ds['categoryColor']), name: ds['categoryName']);
           if (snapshot.hasData) {
             DocumentSnapshot ds = snapshot.data!.docs[index];
             final Task task = Task(
@@ -42,13 +41,11 @@ class TaskList extends StatelessWidget {
                   ),
                 ),
                 isCompleted: ds['isCompleted']);
-            return 
-              TaskCard(
-                    task: task,
-                    index: index,
-                    mobileId: mobileId,
-                  )
-               ;
+            return TaskCard(
+              task: task,
+              index: index,
+              mobileId: mobileId,
+            );
           } else {
             return const SizedBox();
           }

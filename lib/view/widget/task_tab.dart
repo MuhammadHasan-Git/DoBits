@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_app/view/pending_task.dart';
+import 'package:todo_app/view/widget/pending_task.dart';
 import 'package:todo_app/view/widget/completed_task.dart';
-import 'package:todo_app/view/widget/inprogress_task.dart';
+
 import 'package:todo_app/view/widget/todo_task.dart';
 
 class TaskBarView extends StatefulWidget {
@@ -17,7 +17,7 @@ class _TaskBarViewState extends State<TaskBarView>
     with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    TabController tabController = TabController(length: 4, vsync: this);
+    TabController tabController = TabController(length: 3, vsync: this);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -53,13 +53,6 @@ class _TaskBarViewState extends State<TaskBarView>
             ),
             Row(
               children: [
-                Icon(Icons.play_arrow),
-                SizedBox(width: 5),
-                Text('In Progress'),
-              ],
-            ),
-            Row(
-              children: [
                 Icon(CupertinoIcons.clock),
                 SizedBox(width: 5),
                 Text('Pending'),
@@ -73,7 +66,6 @@ class _TaskBarViewState extends State<TaskBarView>
             children: [
               TodoTask(mobileId: widget.mobileId),
               CompletedTask(mobileId: widget.mobileId),
-              InProgressTask(mobileId: widget.mobileId),
               PendingTask(mobileId: widget.mobileId),
             ],
           ),

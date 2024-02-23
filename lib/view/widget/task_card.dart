@@ -62,7 +62,7 @@ class TaskCard extends StatelessWidget {
               task.isCompleted
                   ? SlidableAction(
                       onPressed: (context) =>
-                          homeController.deleteTask(task.id),
+                          homeController.deleteTask(task.id, mobileId),
                       backgroundColor: Colors.red,
                       icon: Icons.delete,
                       borderRadius: BorderRadius.circular(20),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:todo_app/utils/colors.dart';
-import 'package:todo_app/view/task_list.dart';
+import 'package:todo_app/view/widget/task_list.dart';
 
 class PendingTask extends StatelessWidget {
   const PendingTask({super.key, required this.mobileId});

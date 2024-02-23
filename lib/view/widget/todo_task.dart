@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:todo_app/utils/colors.dart';
-import 'package:todo_app/view/task_list.dart';
+import 'package:todo_app/view/widget/task_list.dart';
 
 class TodoTask extends StatelessWidget {
   const TodoTask({super.key, required this.mobileId});

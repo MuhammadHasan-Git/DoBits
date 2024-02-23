@@ -11,7 +11,7 @@ class TaskPriority extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskController = Get.put(TaskController());
+    final taskController = Get.find<TaskController>();
     return Obx(
       () => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -1,10 +1,10 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/sub_task.dart';
 import 'package:todo_app/controller/task_controller.dart';
-import 'package:todo_app/model/edit_task_model.dart';
-import 'package:todo_app/model/update_task.dart';
+import 'package:todo_app/model/task.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/widget/button.dart';
@@ -14,9 +14,9 @@ import 'package:todo_app/view/widget/sub_task.dart';
 import 'package:todo_app/view/widget/task_priority.dart';
 import 'package:todo_app/view/widget/text_field.dart';
 
-class AddTask extends StatelessWidget {
-  final EditTaskModel? editModel;
-  const AddTask({super.key, this.editModel});
+class AddTaskPage extends StatelessWidget {
+  final Task? editModel;
+  const AddTaskPage({super.key, this.editModel});
 
   @override
   Widget build(BuildContext context) {
@@ -208,25 +208,29 @@ class AddTask extends StatelessWidget {
                   CustomButton(
                       text: editModel == null ? "Create Task" : "Update",
                       onPressed: () async {
+                        final subTaskCtrl = Get.find<SubTaskController>();
+                        final Task task = Task(
+                          createdOn: Timestamp.now(),
+                          id: '',
+                          title: taskController.titleController.text.trim(),
+                          date: taskController.selectedDate!.toIso8601String(),
+                          description:
+                              taskController.descriptionController.text.trim(),
+                          time: taskController.selectedTime!.toIso8601String(),
+                          category: taskController
+                              .categories[taskController.chipIndex.value],
+                          priority: taskController.selectedPriority.value,
+                          isRemind: taskController.isRemind.value,
+                          isCompleted: false,
+                          subTasks: subTaskCtrl.subTaskList,
+                        );
                         if (TaskController.formKey.currentState!.validate()) {
                           final subTaskController =
                               Get.find<SubTaskController>();
                           if (editModel == null) {
-                            await taskController.createTask(
-                              context: context,
-                              title: taskController.titleController.text.trim(),
-                              description: taskController
-                                  .descriptionController.text
-                                  .trim(),
-                              category: taskController
-                                  .categories[taskController.chipIndex.value],
-                              priority: taskController.selectedPriority.value,
-                              isRemind: taskController.isRemind.value,
-                              subTasks: subTaskController.subTaskList,
-                            );
+                            await taskController.createTask(taskModel: task);
                           } else {
-                            final UpdateTaskModel updateTaskModel =
-                                UpdateTaskModel(
+                            final Task updateTaskModel = Task(
                               id: editModel!.id,
                               title: taskController.titleController.text,
                               description: taskController
@@ -245,8 +249,10 @@ class AddTask extends StatelessWidget {
                               subTasks: subTaskController.subTaskList.isEmpty
                                   ? []
                                   : subTaskController.subTaskList,
+                              createdOn: Timestamp.now(),
+                              isCompleted: false,
                             );
-                            taskController.updateTask(updateTaskModel, context);
+                            taskController.updateTask(updateTaskModel);
                           }
                         }
                       })

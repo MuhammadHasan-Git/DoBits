@@ -1,10 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/model/category.dart';
-import 'package:todo_app/model/edit_task_model.dart';
-import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
@@ -21,7 +20,7 @@ class PopupButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final homeController = Get.put(HomeController());
+    final homeController = Get.find<HomeController>();
 
     return PopupMenuButton(
       padding: EdgeInsets.zero,
@@ -34,20 +33,23 @@ class PopupButton extends StatelessWidget {
         PopupMenuItem(
           onTap: () {
             Get.to(
-              () => AddTask(
-                editModel: EditTaskModel(
-                    id: task.id,
-                    title: task.title,
-                    description: task.description,
-                    date: task.date,
-                    time: task.time,
-                    category: TaskCategory(
-                        color: task.category.color,
-                        name: task.category.name,
-                        createdOn: task.createdOn),
-                    priorities: task.priority,
-                    subtasks: task.subTasks,
-                    isRemind: task.isRemind),
+              () => AddTaskPage(
+                editModel: Task(
+                  id: task.id,
+                  title: task.title,
+                  description: task.description,
+                  date: task.date,
+                  time: task.time,
+                  category: TaskCategory(
+                      color: task.category.color,
+                      name: task.category.name,
+                      createdOn: task.createdOn),
+                  priority: task.priority,
+                  subTasks: task.subTasks,
+                  isRemind: task.isRemind,
+                  createdOn: Timestamp.now(),
+                  isCompleted: false,
+                ),
               ),
             );
           },

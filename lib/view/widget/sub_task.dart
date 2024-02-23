@@ -2,12 +2,12 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/sub_task.dart';
-import 'package:todo_app/model/edit_task_model.dart';
 import 'package:todo_app/model/sub_tasks.dart';
+import 'package:todo_app/model/task.dart';
 import 'package:todo_app/view/widget/text_field.dart';
 
 class SubTask extends StatelessWidget {
-  final EditTaskModel? editTaskModel;
+  final Task? editTaskModel;
   const SubTask({super.key, required this.editTaskModel});
 
   @override

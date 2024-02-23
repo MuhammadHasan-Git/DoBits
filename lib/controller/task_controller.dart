@@ -8,21 +8,20 @@ import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/sub_task.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/model/category.dart';
-import 'package:todo_app/model/edit_task_model.dart';
 import 'package:todo_app/model/sub_tasks.dart';
 import 'package:todo_app/model/task.dart';
-import 'package:todo_app/model/update_task.dart';
 import 'package:todo_app/services/notification_service.dart';
 import 'package:todo_app/services/shared_preferences_service.dart';
 import 'package:todo_app/utils/colors.dart';
+import 'package:todo_app/view/widget/dialog_content.dart';
 
 class TaskController extends GetxController {
-  final EditTaskModel? editTaskModel;
+  final Task? editTaskModel;
   TaskController({this.editTaskModel});
   static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> categoryKey = GlobalKey<FormState>();
   late final String? mobileId;
-  DateTime? selectedDate;
+  DateTime? selectedDate = DateTime.now();
   DateTime? selectedTime;
 
   static String formattedDate(
@@ -82,7 +81,7 @@ class TaskController extends GetxController {
 
   final categoryName = TextEditingController();
 
-  RxList categories = [].obs;
+  RxList<dynamic> categories = <dynamic>[].obs;
 
   final chipIndex = 0.obs;
 
@@ -100,6 +99,50 @@ class TaskController extends GetxController {
     } else {
       null;
     }
+  }
+
+  Future<void> dialogBuilder(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: black,
+          surfaceTintColor: black,
+          title: const Text(
+            'Create Category',
+            textAlign: TextAlign.center,
+          ),
+          titleTextStyle: const TextStyle(
+            color: white,
+            fontSize: 24,
+          ),
+          content: const DialogContent(),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: darkBlue),
+              child: const Text('Cancle'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                selectedColor.value = 0xff778CDD;
+                buttonIndex.value = 0;
+                categoryName.clear();
+              },
+            ),
+            TextButton(
+                style: TextButton.styleFrom(foregroundColor: darkBlue),
+                child: const Text('Create'),
+                onPressed: () {
+                  if (categoryKey.currentState!.validate()) {
+                    final category = TaskCategory(
+                        color: selectedColor.value, name: categoryName.text);
+                    createCategory(category);
+                  }
+                }),
+          ],
+        );
+      },
+    );
   }
 
   createCategory(TaskCategory category) async {
@@ -174,10 +217,22 @@ class TaskController extends GetxController {
         initialDate: initialDate,
         firstDate: DateTime(1950),
         lastDate: DateTime(2100));
-    if (pickedDate != null) {
-      selectedDate = pickedDate;
-      dateInput.text = formattedDate(dateString: pickedDate.toIso8601String());
-    } else {}
+    if (pickedDate != null && pickedDate.isBefore(DateTime.now())) {
+      await Fluttertoast.showToast(
+          msg: "Task date cannot be in past",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else if (pickedDate != null) {
+      {
+        selectedDate = pickedDate;
+        dateInput.text =
+            formattedDate(dateString: pickedDate.toIso8601String());
+      }
+    }
   }
 
   Future displayTimePicker(
@@ -215,65 +270,40 @@ class TaskController extends GetxController {
     }
   }
 
-  Future<void> createTask({
-    required BuildContext context,
-    required String title,
-    String? description,
-    required TaskCategory category,
-    required String priority,
-    required bool isRemind,
-    required List<SubTasksModel>? subTasks,
-  }) async {
+  Future<void> createTask({required final Task taskModel}) async {
     HomeController.customLoadingDialog("Creating Task...");
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
     final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
-        ? firestore
-            .collection("Guest")
-            .doc(SharedPreferencesService.getData('guestId').toString())
-            .collection("Tasks")
-            .doc()
+        ? firestore.collection("Guest").doc(mobileId).collection("Tasks").doc()
         : firestore
             .collection("Users")
             .doc(auth.currentUser!.uid)
             .collection("Tasks")
             .doc();
-    final task = Task(
-      id: taskRef.id,
-      title: title,
-      date: selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-      description: description == '' ? null : description,
-      time: selectedTime?.toIso8601String() ??
-          timeOfDayToDateTime(TimeOfDay.now()).toIso8601String(),
-      category: category,
-      priority: priority,
-      isRemind: isRemind,
-      subTasks: subTasks?.toList(),
-      createdOn: Timestamp.now(),
-      isCompleted: false,
-    );
-    if (isRemind) {
+
+    if (taskModel.isRemind) {
       NotificationServices().zonedScheduleNotification(
         title: '👋DoBits!',
-        selectedTime: DateTime.parse(task.time),
-        body: task.title,
+        selectedTime: DateTime.parse(taskModel.time),
+        body: taskModel.title,
       );
     }
     try {
       await taskRef.set({
         'id': taskRef.id,
-        'createdOn': task.createdOn,
-        'title': task.title,
-        'date': task.date,
-        'description': task.description,
-        'time': task.time,
-        'categoryName': task.category.name,
-        'categoryColor': task.category.color.toString(),
-        'priority': task.priority,
-        'isRemind': task.isRemind,
-        'subTasks': subTasks?.map((e) => e.toJson()),
+        'createdOn': taskModel.createdOn,
+        'title': taskModel.title,
+        'date': taskModel.date,
+        'description': taskModel.description,
+        'time': taskModel.time,
+        'categoryName': taskModel.category.name,
+        'categoryColor': taskModel.category.color.toString(),
+        'priority': taskModel.priority,
+        'isRemind': taskModel.isRemind,
+        'subTasks': taskModel.subTasks?.map((e) => e.toJson()),
         'isCompleted': false,
-        'milliseconds': DateTime.parse(task.date).millisecondsSinceEpoch,
+        'milliseconds': DateTime.parse(taskModel.date).millisecondsSinceEpoch,
       });
       await Fluttertoast.showToast(
           msg: "Task created successfully!",
@@ -323,21 +353,21 @@ class TaskController extends GetxController {
         ? DateTime.parse(editTaskModel!.time)
         : DateTime.now();
     descriptionController.text = editTaskModel?.description ?? '';
-    if (editTaskModel!.subtasks != null) {
-      for (var i = 0; i < editTaskModel!.subtasks!.length; i++) {
+    if (editTaskModel?.subTasks != null) {
+      for (var i = 0; i < editTaskModel!.subTasks!.length; i++) {
         subTaskController.getSubtask(
             SubTasksModel(
-                subtask: editTaskModel!.subtasks![i].subtask,
-                done: editTaskModel!.subtasks![i].done),
+                subtask: editTaskModel!.subTasks![i].subtask,
+                done: editTaskModel!.subTasks![i].done),
             i);
       }
     }
-    selectedPriority.value = editTaskModel?.priorities ?? 'Low Priority';
+    selectedPriority.value = editTaskModel?.priority ?? 'Low Priority';
     isRemind.value = editTaskModel?.isRemind ?? true;
     super.onInit();
   }
 
-  updateTask(UpdateTaskModel updateTaskModel, context) async {
+  updateTask(Task updateTaskModel) async {
     try {
       HomeController.customLoadingDialog("Updating Task...");
       FirebaseFirestore firestore = FirebaseFirestore.instance;

@@ -9,7 +9,7 @@ class Reminder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskController = Get.put(TaskController());
+    final taskController = Get.find<TaskController>();
     final MaterialStateProperty<Color?> trackColor =
         MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {

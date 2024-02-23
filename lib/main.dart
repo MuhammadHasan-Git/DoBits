@@ -37,7 +37,6 @@ void main() async {
   final timeZoneName = await FlutterTimezone.getLocalTimezone();
   setLocalLocation(getLocation(timeZoneName));
   NotificationServices().initNotification();
-  // Get.put(NotificationServices());
   await AwesomeNotifications().initialize(null, [
     NotificationChannel(
       channelGroupKey: "reminder_channel_group_key",

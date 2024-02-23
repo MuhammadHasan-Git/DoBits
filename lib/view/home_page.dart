@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -99,8 +97,8 @@ class HomePage extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         backgroundColor: blue,
         tooltip: 'Add Task',
-        onPressed: () =>
-            Get.to(() => const AddTask(), transition: Transition.rightToLeft),
+        onPressed: () => Get.to(() => const AddTaskPage(),
+            transition: Transition.rightToLeft),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

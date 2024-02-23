@@ -6,6 +6,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/controller/user_controller.dart';
+import 'package:todo_app/services/shared_preferences_service.dart';
 
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
@@ -46,13 +47,19 @@ class HomeController extends GetxController {
     );
   }
 
-  void deleteTask(String id) async {
+  void deleteTask(String id, String mobileId) async {
     try {
-      final taskRef = FirebaseFirestore.instance
-          .collection("Users")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection("Tasks")
-          .doc(id);
+      final taskRef = FirebaseAuth.instance.currentUser!.isAnonymous
+          ? FirebaseFirestore.instance
+              .collection("Guest")
+              .doc(mobileId)
+              .collection("Tasks")
+              .doc(id)
+          : FirebaseFirestore.instance
+              .collection("Users")
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .collection("Tasks")
+              .doc(id);
       await taskRef.delete();
       Get.back();
       Fluttertoast.showToast(
@@ -116,7 +123,8 @@ class HomeController extends GetxController {
                   color: Colors.red,
                 ),
               ),
-              onPressed: () => deleteTask(id)),
+              onPressed: () =>
+                  deleteTask(id, SharedPreferencesService.getData('guestId'))),
         ],
       ),
     );

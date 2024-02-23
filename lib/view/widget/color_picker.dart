@@ -11,7 +11,7 @@ class ColorPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskController = Get.put(TaskController());
+    final taskController = Get.find<TaskController>();
 
     List<int> colors = const [
       0xff778CDD,

@@ -2,21 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo_app/controller/home_controler.dart';
 import 'package:todo_app/controller/task_controller.dart';
 import 'package:todo_app/model/category.dart';
-import 'package:todo_app/model/edit_task_model.dart';
+import 'package:todo_app/model/task.dart';
 import 'package:todo_app/utils/colors.dart';
 import 'package:todo_app/utils/extensions.dart';
 import 'package:todo_app/view/authentication/login_options.dart';
 
 class CategoryList extends StatelessWidget {
-  final EditTaskModel? editTaskModel;
+  final Task? editTaskModel;
   const CategoryList({super.key, this.editTaskModel});
 
   @override
   Widget build(BuildContext context) {
-    final taskController = Get.put(TaskController());
+    final taskController = Get.find<TaskController>();
 
     return StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -56,8 +55,7 @@ class CategoryList extends StatelessWidget {
                                   ),
                               transition: Transition.downToUp);
                         } else {
-                          HomeController.customLoadingDialog(
-                              "Ctreating Category");
+                          taskController.dialogBuilder(context);
                         }
                       },
                       splashFactory: NoSplash.splashFactory,
